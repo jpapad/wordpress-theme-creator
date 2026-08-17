@@ -1,0 +1,6 @@
+{
+  "name": "HTML to WordPress Theme Converter",
+  "description": "Transform static HTML and CSS files into fully functional, production-ready WordPress themes with template hierarchy, dynamic WP loops, enqueued assets, menus, and one-click ZIP export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
