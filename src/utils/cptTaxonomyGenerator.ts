@@ -1,5 +1,5 @@
 import { CustomPostType, CustomTaxonomy, WordPressThemeFile, WordPressThemeMeta } from '../types';
-import { sanitizeSlug } from './converter';
+import { sanitizeSlug, toPhpPrefix, phpStr } from './converter/php';
 
 /**
  * Generates Custom Post Type and Custom Taxonomy registration code and template files
@@ -9,7 +9,7 @@ export function generateCptAndTaxonomyFiles(
   cpts: CustomPostType[],
   taxonomies?: CustomTaxonomy[]
 ): WordPressThemeFile[] {
-  const prefix = sanitizeSlug(meta.textDomain || meta.name);
+  const prefix = toPhpPrefix(meta.textDomain || meta.name);
   const files: WordPressThemeFile[] = [];
 
   const defaultTaxonomies: CustomTaxonomy[] = taxonomies && taxonomies.length > 0 ? taxonomies : [
@@ -36,19 +36,19 @@ export function generateCptAndTaxonomyFiles(
     // Register Custom Post Type: ${cpt.pluralName}
     register_post_type('${cpt.slug}', array(
         'labels' => array(
-            'name'                  => _x('${cpt.pluralName}', 'Post type general name', '${meta.textDomain}'),
-            'singular_name'         => _x('${cpt.singularName}', 'Post type singular name', '${meta.textDomain}'),
-            'menu_name'             => _x('${cpt.pluralName}', 'Admin Menu text', '${meta.textDomain}'),
-            'name_admin_bar'        => _x('${cpt.singularName}', 'Add New on Toolbar', '${meta.textDomain}'),
+            'name'                  => _x('${phpStr(cpt.pluralName)}', 'Post type general name', '${meta.textDomain}'),
+            'singular_name'         => _x('${phpStr(cpt.singularName)}', 'Post type singular name', '${meta.textDomain}'),
+            'menu_name'             => _x('${phpStr(cpt.pluralName)}', 'Admin Menu text', '${meta.textDomain}'),
+            'name_admin_bar'        => _x('${phpStr(cpt.singularName)}', 'Add New on Toolbar', '${meta.textDomain}'),
             'add_new'               => __('Add New', '${meta.textDomain}'),
-            'add_new_item'          => __('Add New ${cpt.singularName}', '${meta.textDomain}'),
-            'new_item'              => __('New ${cpt.singularName}', '${meta.textDomain}'),
-            'edit_item'             => __('Edit ${cpt.singularName}', '${meta.textDomain}'),
-            'view_item'             => __('View ${cpt.singularName}', '${meta.textDomain}'),
-            'all_items'             => __('All ${cpt.pluralName}', '${meta.textDomain}'),
-            'search_items'          => __('Search ${cpt.pluralName}', '${meta.textDomain}'),
-            'not_found'             => __('No ${cpt.pluralName.toLowerCase()} found.', '${meta.textDomain}'),
-            'not_found_in_trash'    => __('No ${cpt.pluralName.toLowerCase()} found in Trash.', '${meta.textDomain}'),
+            'add_new_item'          => __('Add New ${phpStr(cpt.singularName)}', '${meta.textDomain}'),
+            'new_item'              => __('New ${phpStr(cpt.singularName)}', '${meta.textDomain}'),
+            'edit_item'             => __('Edit ${phpStr(cpt.singularName)}', '${meta.textDomain}'),
+            'view_item'             => __('View ${phpStr(cpt.singularName)}', '${meta.textDomain}'),
+            'all_items'             => __('All ${phpStr(cpt.pluralName)}', '${meta.textDomain}'),
+            'search_items'          => __('Search ${phpStr(cpt.pluralName)}', '${meta.textDomain}'),
+            'not_found'             => __('No ${phpStr(cpt.pluralName.toLowerCase())} found.', '${meta.textDomain}'),
+            'not_found_in_trash'    => __('No ${phpStr(cpt.pluralName.toLowerCase())} found in Trash.', '${meta.textDomain}'),
         ),
         'public'             => true,
         'publicly_queryable' => true,
@@ -69,17 +69,17 @@ export function generateCptAndTaxonomyFiles(
     // Register Custom Taxonomy: ${tax.pluralName}
     register_taxonomy('${tax.slug}', array(${tax.postTypes.map(p => `'${p}'`).join(', ')}), array(
         'labels' => array(
-            'name'              => _x('${tax.pluralName}', 'taxonomy general name', '${meta.textDomain}'),
-            'singular_name'     => _x('${tax.singularName}', 'taxonomy singular name', '${meta.textDomain}'),
-            'search_items'      => __('Search ${tax.pluralName}', '${meta.textDomain}'),
-            'all_items'         => __('All ${tax.pluralName}', '${meta.textDomain}'),
-            'parent_item'       => __('Parent ${tax.singularName}', '${meta.textDomain}'),
-            'parent_item_colon' => __('Parent ${tax.singularName}:', '${meta.textDomain}'),
-            'edit_item'         => __('Edit ${tax.singularName}', '${meta.textDomain}'),
-            'update_item'       => __('Update ${tax.singularName}', '${meta.textDomain}'),
-            'add_new_item'      => __('Add New ${tax.singularName}', '${meta.textDomain}'),
-            'new_item_name'     => __('New ${tax.singularName} Name', '${meta.textDomain}'),
-            'menu_name'         => __('${tax.pluralName}', '${meta.textDomain}'),
+            'name'              => _x('${phpStr(tax.pluralName)}', 'taxonomy general name', '${meta.textDomain}'),
+            'singular_name'     => _x('${phpStr(tax.singularName)}', 'taxonomy singular name', '${meta.textDomain}'),
+            'search_items'      => __('Search ${phpStr(tax.pluralName)}', '${meta.textDomain}'),
+            'all_items'         => __('All ${phpStr(tax.pluralName)}', '${meta.textDomain}'),
+            'parent_item'       => __('Parent ${phpStr(tax.singularName)}', '${meta.textDomain}'),
+            'parent_item_colon' => __('Parent ${phpStr(tax.singularName)}:', '${meta.textDomain}'),
+            'edit_item'         => __('Edit ${phpStr(tax.singularName)}', '${meta.textDomain}'),
+            'update_item'       => __('Update ${phpStr(tax.singularName)}', '${meta.textDomain}'),
+            'add_new_item'      => __('Add New ${phpStr(tax.singularName)}', '${meta.textDomain}'),
+            'new_item_name'     => __('New ${phpStr(tax.singularName)} Name', '${meta.textDomain}'),
+            'menu_name'         => __('${phpStr(tax.pluralName)}', '${meta.textDomain}'),
         ),
         'hierarchical'      => ${tax.hierarchical ? 'true' : 'false'},
         'show_ui'           => true,
@@ -186,8 +186,8 @@ get_header();
 
         <?php
         the_post_navigation(array(
-            'prev_text' => '<span class="nav-subtitle">' . esc_html__('Previous ${cpt.singularName}:', '${meta.textDomain}') . '</span> <span class="nav-title">%title</span>',
-            'next_text' => '<span class="nav-subtitle">' . esc_html__('Next ${cpt.singularName}:', '${meta.textDomain}') . '</span> <span class="nav-title">%title</span>',
+            'prev_text' => '<span class="nav-subtitle">' . esc_html__('Previous ${phpStr(cpt.singularName)}:', '${meta.textDomain}') . '</span> <span class="nav-title">%title</span>',
+            'next_text' => '<span class="nav-subtitle">' . esc_html__('Next ${phpStr(cpt.singularName)}:', '${meta.textDomain}') . '</span> <span class="nav-title">%title</span>',
         ));
 
     endwhile;

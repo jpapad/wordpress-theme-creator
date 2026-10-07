@@ -32,6 +32,7 @@ export const SAMPLE_TEMPLATES: SampleTemplate[] = [
       enableBlockPatterns: true,
       generateThemeJson: true,
       enableACFHelper: true,
+      enableElementor: true,
       customPostTypes: [
         {
           id: 'cpt-portfolio',

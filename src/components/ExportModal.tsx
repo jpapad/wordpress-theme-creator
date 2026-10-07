@@ -87,47 +87,47 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-      <div className="bg-[#0c0e15] border border-white/[0.08] rounded-3xl w-full max-w-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-md animate-in fade-in">
+      <div className="bg-island border border-line rounded-3xl w-full max-w-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between bg-[#08090d]">
+        <div className="px-6 py-4 border-b border-line flex items-center justify-between bg-inset">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
+            <div className="p-2 bg-emerald-500/10 text-emerald-700 rounded-xl border border-emerald-500/20">
               <FolderArchive className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white font-display">Export WordPress Theme Packages</h2>
-              <p className="text-xs text-zinc-400">Ready for instant upload to WordPress 6.x &amp; WooCommerce</p>
+              <h2 className="text-base font-bold text-ink font-display">Export WordPress Theme Packages</h2>
+              <p className="text-xs text-muted">Ready for instant upload to WordPress 6.x &amp; WooCommerce</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-zinc-400 hover:text-white rounded-xl hover:bg-white/[0.06] transition-colors"
+            className="p-1.5 text-muted hover:text-ink rounded-xl hover:bg-ink/[0.06] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto space-y-6 text-xs text-zinc-300">
+        <div className="p-6 overflow-y-auto space-y-6 text-xs text-ink-2">
           {/* Main Download Card */}
-          <div className="p-5 bg-gradient-to-br from-[#10141f] via-[#0d0f17] to-[#08090d] border border-emerald-500/30 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+          <div className="p-5 bg-gradient-to-br from-island via-island to-inset border border-emerald-500/30 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
             <div className="space-y-1.5 text-center sm:text-left">
-              <div className="text-sm font-bold text-white flex items-center gap-2 justify-center sm:justify-start font-mono">
-                <FileArchive className="w-4 h-4 text-emerald-400" />
+              <div className="text-sm font-bold text-ink flex items-center gap-2 justify-center sm:justify-start font-mono">
+                <FileArchive className="w-4 h-4 text-emerald-700" />
                 <span>{themeSlug}.zip</span>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 font-sans font-bold border border-emerald-500/30">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-700 font-sans font-bold border border-emerald-500/30">
                   Parent Theme
                 </span>
               </div>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-muted">
                 Includes all <strong>{result?.files.length || 0} files</strong> (PHP templates, ACF Local JSON sync, Gutenberg block patterns, WooCommerce templates, and 1200x900px screenshot.png).
               </p>
             </div>
 
             <button
               onClick={onDownloadZip}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-2xl text-xs font-bold shadow-lg shadow-emerald-500/20 active:scale-95 transition-all shrink-0"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-ink rounded-2xl text-xs font-bold shadow-lg shadow-emerald-500/20 active:scale-95 transition-all shrink-0"
             >
               <Download className="w-4 h-4" />
               <span>Download Theme ZIP</span>
@@ -135,16 +135,16 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           </div>
 
           {/* Child Theme Generator Card */}
-          <div className="p-5 bg-gradient-to-br from-[#0e1322] via-[#0d0f17] to-[#08090d] border border-blue-500/30 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+          <div className="p-5 bg-gradient-to-br from-island via-island to-inset border border-blue-500/30 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
             <div className="space-y-1.5 text-center sm:text-left">
-              <div className="text-sm font-bold text-white flex items-center gap-2 justify-center sm:justify-start font-mono">
-                <ShieldCheck className="w-4 h-4 text-blue-400" />
+              <div className="text-sm font-bold text-ink flex items-center gap-2 justify-center sm:justify-start font-mono">
+                <ShieldCheck className="w-4 h-4 text-blue-700" />
                 <span>{childSlug}.zip</span>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-blue-500/20 text-blue-300 font-sans font-bold border border-blue-500/30">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-blue-500/20 text-blue-700 font-sans font-bold border border-blue-500/30">
                   Child Theme
                 </span>
               </div>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-muted">
                 Companion Child Theme with clean parent CSS enqueueing. Allows safe customizations without losing modifications on parent updates.
               </p>
             </div>
@@ -152,7 +152,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             <button
               onClick={handleDownloadChildZip}
               disabled={isGeneratingChild}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-zinc-800/90 hover:bg-zinc-700 text-blue-300 border border-blue-500/40 rounded-2xl text-xs font-bold transition-all shrink-0 hover:text-white"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-inset hover:bg-line text-blue-700 border border-blue-500/40 rounded-2xl text-xs font-bold transition-all shrink-0 hover:text-ink"
             >
               <Download className="w-4 h-4" />
               <span>{isGeneratingChild ? 'Packaging...' : 'Download Child Theme (.ZIP)'}</span>
@@ -160,16 +160,16 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           </div>
 
           {/* Theme Screenshot Generator Preview */}
-          <div className="p-5 bg-[#08090d] border border-white/[0.06] rounded-3xl space-y-3">
+          <div className="p-5 bg-inset border border-line rounded-3xl space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <Image className="w-4 h-4 text-amber-400" />
-                <h3 className="font-bold text-white font-display">Generated Theme Screenshot (screenshot.png)</h3>
+                <Image className="w-4 h-4 text-accent-ink" />
+                <h3 className="font-bold text-ink font-display">Generated Theme Screenshot (screenshot.png)</h3>
               </div>
               
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] text-zinc-400">Accent:</span>
+                  <span className="text-[11px] text-muted">Accent:</span>
                   <input
                     type="color"
                     value={accentColor}
@@ -179,7 +179,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                 </div>
                 <button
                   onClick={handleDownloadScreenshotOnly}
-                  className="text-amber-400 hover:text-amber-300 text-[11px] font-semibold flex items-center gap-1"
+                  className="text-accent-ink hover:text-accent-ink text-[11px] font-semibold flex items-center gap-1"
                 >
                   <Download className="w-3 h-3" />
                   <span>Download PNG (1200x900)</span>
@@ -188,7 +188,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             </div>
 
             {screenshotDataUrl && (
-              <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] max-h-48 flex items-center justify-center bg-black">
+              <div className="relative rounded-2xl overflow-hidden border border-line max-h-48 flex items-center justify-center bg-inset">
                 <img
                   src={screenshotDataUrl}
                   alt="Theme Screenshot Preview"
@@ -196,40 +196,40 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                 />
               </div>
             )}
-            <p className="text-[11px] text-zinc-500">
+            <p className="text-[11px] text-faint">
               Automatically included inside the exported ZIP so WordPress Admin displays a rich preview card under <strong>Appearance &gt; Themes</strong>.
             </p>
           </div>
 
           {/* Installation Step-by-Step */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold text-zinc-200 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-ink-2 uppercase tracking-wider">
               How to Install in WordPress (3 Simple Steps)
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-4 bg-[#08090d] border border-white/[0.06] rounded-2xl space-y-1">
+              <div className="p-4 bg-inset border border-line rounded-2xl space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-amber-400 text-black flex items-center justify-center text-[10px] font-bold">1</span>
-                  <span className="font-semibold text-white">Open WP Admin</span>
+                  <span className="w-5 h-5 rounded-full bg-accent text-white flex items-center justify-center text-[10px] font-bold">1</span>
+                  <span className="font-semibold text-ink">Open WP Admin</span>
                 </div>
-                <p className="text-zinc-400 text-[11px]">Navigate to <strong>Appearance &rarr; Themes</strong>.</p>
+                <p className="text-muted text-[11px]">Navigate to <strong>Appearance &rarr; Themes</strong>.</p>
               </div>
 
-              <div className="p-4 bg-[#08090d] border border-white/[0.06] rounded-2xl space-y-1">
+              <div className="p-4 bg-inset border border-line rounded-2xl space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-amber-400 text-black flex items-center justify-center text-[10px] font-bold">2</span>
-                  <span className="font-semibold text-white">Upload Theme ZIP</span>
+                  <span className="w-5 h-5 rounded-full bg-accent text-white flex items-center justify-center text-[10px] font-bold">2</span>
+                  <span className="font-semibold text-ink">Upload Theme ZIP</span>
                 </div>
-                <p className="text-zinc-400 text-[11px]">Click <strong>Add New &rarr; Upload Theme</strong> and select <code>{themeSlug}.zip</code>.</p>
+                <p className="text-muted text-[11px]">Click <strong>Add New &rarr; Upload Theme</strong> and select <code>{themeSlug}.zip</code>.</p>
               </div>
 
-              <div className="p-4 bg-[#08090d] border border-white/[0.06] rounded-2xl space-y-1">
+              <div className="p-4 bg-inset border border-line rounded-2xl space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-amber-400 text-black flex items-center justify-center text-[10px] font-bold">3</span>
-                  <span className="font-semibold text-white">Activate &amp; Enjoy</span>
+                  <span className="w-5 h-5 rounded-full bg-accent text-white flex items-center justify-center text-[10px] font-bold">3</span>
+                  <span className="font-semibold text-ink">Activate &amp; Enjoy</span>
                 </div>
-                <p className="text-zinc-400 text-[11px]">Click <strong>Activate</strong>. Menus and widgets sync automatically.</p>
+                <p className="text-muted text-[11px]">Click <strong>Activate</strong>. Menus and widgets sync automatically.</p>
               </div>
             </div>
           </div>
@@ -237,30 +237,30 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           {/* WP-CLI Command */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-1.5">
-                <Terminal className="w-3.5 h-3.5 text-amber-400" />
+              <span className="text-xs font-bold text-ink-2 uppercase tracking-wider flex items-center gap-1.5">
+                <Terminal className="w-3.5 h-3.5 text-accent-ink" />
                 <span>WP-CLI Quick Install</span>
               </span>
               <button
                 onClick={handleCopyCli}
-                className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium"
+                className="text-xs text-accent-ink hover:text-accent-ink flex items-center gap-1 font-medium"
               >
-                {copiedCli ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                {copiedCli ? <Check className="w-3 h-3 text-emerald-700" /> : <Copy className="w-3 h-3" />}
                 <span>{copiedCli ? 'Copied' : 'Copy WP-CLI'}</span>
               </button>
             </div>
 
-            <div className="p-3 bg-[#08090d] border border-white/[0.08] rounded-2xl font-mono text-xs text-amber-300/90">
+            <div className="p-3 bg-inset border border-line rounded-2xl font-mono text-xs text-accent-ink/90">
               <code>{cliCommand}</code>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-white/[0.06] bg-[#08090d] flex items-center justify-end">
+        <div className="px-6 py-4 border-t border-line bg-inset flex items-center justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2 text-xs font-semibold text-zinc-200 hover:text-white bg-zinc-800 hover:bg-zinc-700 rounded-xl transition-colors border border-white/10"
+            className="px-5 py-2 text-xs font-semibold text-ink-2 hover:text-ink bg-inset hover:bg-line rounded-xl transition-colors border border-line"
           >
             Close
           </button>

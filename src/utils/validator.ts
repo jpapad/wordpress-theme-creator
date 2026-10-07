@@ -1,4 +1,5 @@
 import { ValidationItem, WordPressThemeFile, WordPressThemeMeta } from '../types';
+import { lintPhp, findDuplicateDeclarations, findMissingIncludes, PhpLintError } from './phpLint';
 
 /**
  * Validates generated WordPress theme files against WordPress.org guidelines
@@ -241,5 +242,78 @@ export function validateWordPressTheme(
     });
   }
 
+  // 14. Real PHP syntax check of every generated PHP file
+  const phpFiles = files.filter((f) => f.language === 'php');
+  const syntaxErrors = phpFiles.map((f) => lintPhp(f.path, f.content)).filter((e): e is PhpLintError => !!e);
+  items.push({
+    id: 'security-php-syntax',
+    title: syntaxErrors.length ? `PHP Syntax Errors (${syntaxErrors.length})` : `PHP Syntax Valid (${phpFiles.length} files)`,
+    category: 'standards',
+    status: syntaxErrors.length ? 'error' : 'pass',
+    description: syntaxErrors.length
+      ? 'These files would cause a fatal error (white screen) when WordPress loads them.'
+      : 'Every generated PHP file was parsed successfully by a PHP 8 parser.',
+    codeSnippet: syntaxErrors.length ? syntaxErrors.map((e) => `${e.path}: ${e.message}`).join('\n') : undefined,
+    recommendation: syntaxErrors.length ? 'Fix the reported lines in the file explorer, or adjust the source HTML / theme settings and convert again.' : undefined,
+  });
+
+  // 15. Duplicate function / class declarations ("Cannot redeclare" fatal error)
+  const duplicates = findDuplicateDeclarations(files);
+  if (duplicates.length) {
+    items.push({
+      id: 'core-duplicate-declarations',
+      title: `Duplicate PHP Declarations (${duplicates.length})`,
+      category: 'core',
+      status: 'error',
+      description: 'The same function or class is declared more than once, which is a fatal error in PHP.',
+      codeSnippet: duplicates.join('\n'),
+      recommendation: 'Rename one of the declarations or wrap it in function_exists().',
+    });
+  }
+
+  // 16. require/include targets exist
+  const missingIncludes = findMissingIncludes(files);
+  if (missingIncludes.length) {
+    items.push({
+      id: 'core-missing-includes',
+      title: `Missing Included Files (${missingIncludes.length})`,
+      category: 'core',
+      status: 'error',
+      description: 'A required file is not part of the theme; require_once would trigger a fatal error.',
+      codeSnippet: missingIncludes.join('\n'),
+    });
+  }
+
+  // 17. JSON files are valid
+  const badJson = files
+    .filter((f) => f.path.endsWith('.json'))
+    .filter((f) => {
+      try {
+        JSON.parse(f.content);
+        return false;
+      } catch {
+        return true;
+      }
+    });
+  if (badJson.length) {
+    items.push({
+      id: 'standards-json',
+      title: `Invalid JSON (${badJson.length})`,
+      category: 'standards',
+      status: 'error',
+      description: 'These JSON files cannot be parsed by WordPress.',
+      codeSnippet: badJson.map((f) => f.path).join('\n'),
+    });
+  }
+
   return items;
+}
+
+/**
+ * Theme score derived from the validation results (errors weigh more than warnings).
+ */
+export function computeThemeScore(items: ValidationItem[]): number {
+  const errors = items.filter((i) => i.status === 'error').length;
+  const warnings = items.filter((i) => i.status === 'warning').length;
+  return Math.max(0, 100 - errors * 15 - warnings * 4);
 }

@@ -157,7 +157,9 @@ export interface WordPressThemeFile {
   path: string;
   name: string;
   content: string;
-  language: 'php' | 'css' | 'javascript' | 'json' | 'markdown';
+  language: 'php' | 'css' | 'javascript' | 'json' | 'markdown' | 'binary';
+  /** 'dataurl' when content is a base64 data: URL (images, fonts) */
+  encoding?: 'dataurl';
   purpose: string;
   isCore?: boolean;
   folder?: string;
@@ -203,6 +205,17 @@ export interface ConversionResult {
   summary: string;
   aiEnhanced?: boolean;
   blueprint?: PlaygroundBlueprint;
+  /** Sections whose content became ACF fields / Elementor widget controls */
+  editableSections?: EditableSectionSummary[];
+}
+
+export interface EditableSectionSummary {
+  slug: string;
+  title: string;
+  page: string;
+  fields: { name: string; label: string; type: 'text' | 'html' | 'url' | 'image' }[];
+  /** Repeated items (cards, list entries) that stay static */
+  repeatedItems: number;
 }
 
 export interface SampleTemplate {
@@ -215,3 +228,5 @@ export interface SampleTemplate {
   options: ConversionOptions;
   files: SourceFile[];
 }
+
+export type EditorFontSize = 'sm' | 'md' | 'lg';

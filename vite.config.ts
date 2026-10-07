@@ -6,6 +6,15 @@ import {defineConfig} from 'vite';
 export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss()],
+    // php-parser's browser bundle reads process.arch (64-bit integer limits); emulate PHP on x64
+    define: {
+      'process.arch': JSON.stringify('x64'),
+    },
+    optimizeDeps: {
+      esbuildOptions: {
+        define: { 'process.arch': JSON.stringify('x64') },
+      },
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

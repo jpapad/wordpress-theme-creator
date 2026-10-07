@@ -23,6 +23,7 @@ import {
   X
 } from 'lucide-react';
 import { ConversionOptions, ConversionResult, VisualTagBinding, WordPressThemeMeta } from '../types';
+import { scopeCss } from '../utils/scopeCss';
 
 interface ThemeLivePreviewProps {
   result: ConversionResult | null;
@@ -61,9 +62,9 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
     return styleFile?.content || '';
   }, [result]);
 
-  // Clean CSS for iframe/preview injection
+  // Theme CSS confined to the preview container so it cannot restyle the app
   const previewCss = useMemo(() => {
-    return rawCss.replace(/\/\*[\s\S]*?\*\//, '');
+    return scopeCss(rawCss.replace(/\/\*[\s\S]*?\*\//, ''), '.theme-preview-container');
   }, [rawCss]);
 
   const activeBindings = options.visualBindings || [];
@@ -113,13 +114,13 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
 
   if (!result) {
     return (
-      <div className="flex-1 flex items-center justify-center p-8 bg-[#09090b] text-zinc-400 text-center">
+      <div className="flex-1 flex items-center justify-center p-8 bg-inset text-muted text-center">
         <div>
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto mb-3 border border-amber-500/20">
+          <div className="w-12 h-12 rounded-2xl bg-accent/10 text-accent-ink flex items-center justify-center mx-auto mb-3 border border-accent/20">
             <Monitor className="w-6 h-6" />
           </div>
-          <h3 className="text-base font-semibold text-white mb-1">Theme Preview Ready</h3>
-          <p className="text-xs text-zinc-400 max-w-sm">
+          <h3 className="text-base font-semibold text-ink mb-1">Theme Preview Ready</h3>
+          <p className="text-xs text-muted max-w-sm">
             Click "Convert to WP" or select a template to preview the theme live in the interactive WordPress simulator.
           </p>
         </div>
@@ -128,15 +129,15 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#08090d] text-zinc-100 overflow-hidden">
+    <div className="flex-1 flex flex-col h-full bg-inset text-ink overflow-hidden">
       {/* Top Toolbar */}
-      <div className="bg-[#0c0e15] border-b border-white/[0.06] px-4 py-2 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="bg-island border-b border-line px-4 py-2 flex flex-wrap items-center justify-between gap-3 text-xs">
         {/* Template Switcher */}
-        <div className="flex items-center gap-1 bg-[#07080c] p-1 rounded-xl border border-white/[0.08] shadow-inner">
+        <div className="flex items-center gap-1 bg-inset p-1 rounded-xl border border-line shadow-inner">
           <button
             onClick={() => setActiveTemplate('home')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-              activeTemplate === 'home' ? 'bg-zinc-800/90 text-amber-300 border border-amber-500/30 shadow-sm' : 'text-zinc-400 hover:text-white'
+              activeTemplate === 'home' ? 'bg-inset text-accent-ink border border-accent/30 shadow-sm' : 'text-muted hover:text-ink'
             }`}
           >
             Home (index.php)
@@ -144,7 +145,7 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
           <button
             onClick={() => setActiveTemplate('single')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-              activeTemplate === 'single' ? 'bg-zinc-800/90 text-amber-300 border border-amber-500/30 shadow-sm' : 'text-zinc-400 hover:text-white'
+              activeTemplate === 'single' ? 'bg-inset text-accent-ink border border-accent/30 shadow-sm' : 'text-muted hover:text-ink'
             }`}
           >
             Single Post (single.php)
@@ -152,7 +153,7 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
           <button
             onClick={() => setActiveTemplate('page')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-              activeTemplate === 'page' ? 'bg-zinc-800/90 text-amber-300 border border-amber-500/30 shadow-sm' : 'text-zinc-400 hover:text-white'
+              activeTemplate === 'page' ? 'bg-inset text-accent-ink border border-accent/30 shadow-sm' : 'text-muted hover:text-ink'
             }`}
           >
             Page (page.php)
@@ -160,7 +161,7 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
           <button
             onClick={() => setActiveTemplate('archive')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-              activeTemplate === 'archive' ? 'bg-zinc-800/90 text-amber-300 border border-amber-500/30 shadow-sm' : 'text-zinc-400 hover:text-white'
+              activeTemplate === 'archive' ? 'bg-inset text-accent-ink border border-accent/30 shadow-sm' : 'text-muted hover:text-ink'
             }`}
           >
             Archive (archive.php)
@@ -169,7 +170,7 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
             <button
               onClick={() => setActiveTemplate('shop')}
               className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-                activeTemplate === 'shop' ? 'bg-zinc-800/90 text-purple-300 border border-purple-500/30 shadow-sm' : 'text-zinc-400 hover:text-white'
+                activeTemplate === 'shop' ? 'bg-inset text-purple-700 border border-purple-500/30 shadow-sm' : 'text-muted hover:text-ink'
               }`}
             >
               Shop (woocommerce.php)
@@ -184,15 +185,15 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
             onClick={() => setInspectMode(!inspectMode)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
               inspectMode
-                ? 'bg-amber-400 text-black border-amber-300 font-bold shadow-lg shadow-amber-500/20'
-                : 'bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 border-white/10'
+                ? 'bg-accent text-white border-accent font-bold shadow-lg shadow-accent/20'
+                : 'bg-inset hover:bg-inset text-ink-2 border-line'
             }`}
             title="Click any element in the preview to bind it to dynamic WordPress PHP template tags"
           >
-            <Crosshair className={`w-3.5 h-3.5 ${inspectMode ? 'animate-spin' : 'text-amber-400'}`} />
+            <Crosshair className={`w-3.5 h-3.5 ${inspectMode ? 'animate-spin' : 'text-accent-ink'}`} />
             <span>{inspectMode ? 'Inspecting' : 'Visual Tag Binder'}</span>
             {activeBindings.length > 0 && (
-              <span className={`px-1.5 py-0.2 rounded-md text-[10px] font-mono ${inspectMode ? 'bg-black text-amber-400' : 'bg-amber-500/20 text-amber-300'}`}>
+              <span className={`px-1.5 py-0.2 rounded-md text-[10px] font-mono ${inspectMode ? 'bg-inset text-accent-ink' : 'bg-accent/20 text-accent-ink'}`}>
                 {activeBindings.length}
               </span>
             )}
@@ -202,20 +203,20 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
             onClick={() => setShowTagBinder(!showTagBinder)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all ${
               showTagBinder
-                ? 'bg-zinc-800/90 text-amber-300 border-amber-500/30'
-                : 'bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 border-white/10'
+                ? 'bg-inset text-accent-ink border-accent/30'
+                : 'bg-inset hover:bg-inset text-ink-2 border-line'
             }`}
           >
-            <Tag className="w-3.5 h-3.5 text-amber-400" />
+            <Tag className="w-3.5 h-3.5 text-accent-ink" />
             <span className="hidden sm:inline">Bindings ({activeBindings.length})</span>
           </button>
 
           {/* Viewport switchers */}
-          <div className="flex items-center bg-[#07080c] p-1 rounded-xl border border-white/[0.08] shadow-inner">
+          <div className="flex items-center bg-inset p-1 rounded-xl border border-line shadow-inner">
             <button
               onClick={() => setViewport('desktop')}
               className={`p-1.5 rounded-lg transition-all ${
-                viewport === 'desktop' ? 'bg-zinc-800 text-amber-300 shadow-sm border border-amber-500/30' : 'text-zinc-500 hover:text-zinc-300'
+                viewport === 'desktop' ? 'bg-inset text-accent-ink shadow-sm border border-accent/30' : 'text-faint hover:text-ink-2'
               }`}
               title="Desktop 100%"
             >
@@ -224,7 +225,7 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
             <button
               onClick={() => setViewport('tablet')}
               className={`p-1.5 rounded-lg transition-all ${
-                viewport === 'tablet' ? 'bg-zinc-800 text-amber-300 shadow-sm border border-amber-500/30' : 'text-zinc-500 hover:text-zinc-300'
+                viewport === 'tablet' ? 'bg-inset text-accent-ink shadow-sm border border-accent/30' : 'text-faint hover:text-ink-2'
               }`}
               title="Tablet 768px"
             >
@@ -233,7 +234,7 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
             <button
               onClick={() => setViewport('mobile')}
               className={`p-1.5 rounded-lg transition-all ${
-                viewport === 'mobile' ? 'bg-zinc-800 text-amber-300 shadow-sm border border-amber-500/30' : 'text-zinc-500 hover:text-zinc-300'
+                viewport === 'mobile' ? 'bg-inset text-accent-ink shadow-sm border border-accent/30' : 'text-faint hover:text-ink-2'
               }`}
               title="Mobile 375px"
             >
@@ -245,8 +246,8 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
             onClick={() => setShowCustomizer(!showCustomizer)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all ${
               showCustomizer
-                ? 'bg-zinc-800 text-amber-300 border-amber-500/40 shadow-sm'
-                : 'bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 border-white/10'
+                ? 'bg-inset text-accent-ink border-accent/40 shadow-sm'
+                : 'bg-inset hover:bg-inset text-ink-2 border-line'
             }`}
           >
             <Sliders className="w-3.5 h-3.5" />
@@ -257,15 +258,15 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
 
       {/* Inspect Mode Banner */}
       {inspectMode && (
-        <div className="bg-amber-500/15 border-b border-amber-500/30 px-4 py-2 flex items-center justify-between text-xs text-amber-300">
+        <div className="bg-accent/15 border-b border-accent/30 px-4 py-2 flex items-center justify-between text-xs text-accent-ink">
           <div className="flex items-center gap-2">
-            <Crosshair className="w-4 h-4 text-amber-400 animate-pulse" />
+            <Crosshair className="w-4 h-4 text-accent-ink animate-pulse" />
             <span className="font-semibold">Interactive Visual Tag Binder Active:</span>
-            <span className="text-zinc-300">Click any headline, post card, image or paragraph in the preview below to bind it to WordPress template tags.</span>
+            <span className="text-ink-2">Click any headline, post card, image or paragraph in the preview below to bind it to WordPress template tags.</span>
           </div>
           <button
             onClick={() => setInspectMode(false)}
-            className="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded text-[11px] font-medium transition-colors"
+            className="px-2.5 py-1 bg-inset hover:bg-line text-ink-2 rounded text-[11px] font-medium transition-colors"
           >
             Exit Inspector
           </button>
@@ -276,29 +277,29 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
       <div className="flex-1 flex overflow-hidden">
         {/* Visual Tag Bindings Drawer */}
         {showTagBinder && (
-          <div className="w-80 bg-[#0d0d10] border-r border-zinc-800/80 p-4 overflow-y-auto space-y-4 text-xs shrink-0">
-            <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
-              <div className="font-bold text-zinc-200 uppercase tracking-wider text-[11px] flex items-center gap-2">
-                <Tag className="w-3.5 h-3.5 text-amber-400" />
+          <div className="w-80 bg-inset border-r border-line p-4 overflow-y-auto space-y-4 text-xs shrink-0">
+            <div className="flex items-center justify-between pb-2 border-b border-line">
+              <div className="font-bold text-ink-2 uppercase tracking-wider text-[11px] flex items-center gap-2">
+                <Tag className="w-3.5 h-3.5 text-accent-ink" />
                 <span>Visual Tag Bindings ({activeBindings.length})</span>
               </div>
               <button
                 onClick={() => setShowTagBinder(false)}
-                className="text-zinc-500 hover:text-zinc-300"
+                className="text-faint hover:text-ink-2"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-[11px] text-zinc-400 leading-relaxed">
+            <p className="text-[11px] text-muted leading-relaxed">
               These mappings replace static HTML selectors with dynamic WordPress template tags in the converted theme.
             </p>
 
             {activeBindings.length === 0 ? (
-              <div className="p-4 bg-[#09090b] border border-dashed border-zinc-800 rounded-xl text-center space-y-2">
-                <Crosshair className="w-5 h-5 text-amber-400/60 mx-auto" />
-                <div className="text-zinc-300 font-medium">No bindings created yet</div>
-                <p className="text-[11px] text-zinc-500">
+              <div className="p-4 bg-inset border border-dashed border-line rounded-xl text-center space-y-2">
+                <Crosshair className="w-5 h-5 text-accent-ink/60 mx-auto" />
+                <div className="text-ink-2 font-medium">No bindings created yet</div>
+                <p className="text-[11px] text-faint">
                   Turn on <strong>Visual Tag Binder</strong> above and click elements in the live preview.
                 </p>
               </div>
@@ -307,24 +308,24 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
                 {activeBindings.map((binding) => (
                   <div
                     key={binding.id}
-                    className="p-3 bg-[#09090b] border border-zinc-800 hover:border-zinc-700 rounded-xl space-y-1.5 transition-colors"
+                    className="p-3 bg-inset border border-line hover:border-line rounded-xl space-y-1.5 transition-colors"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-[11px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                      <span className="font-mono text-[11px] font-bold text-accent-ink bg-accent/10 px-1.5 py-0.5 rounded border border-accent/20">
                         {binding.selector}
                       </span>
                       <button
                         onClick={() => handleRemoveBinding(binding.id)}
-                        className="text-zinc-500 hover:text-red-400 transition-colors p-1"
+                        className="text-faint hover:text-red-700 transition-colors p-1"
                         title="Remove Binding"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
 
-                    <div className="text-zinc-300 font-mono text-[11px] flex items-center gap-1.5">
-                      <ChevronRight className="w-3 h-3 text-zinc-500" />
-                      <span className="text-emerald-400">
+                    <div className="text-ink-2 font-mono text-[11px] flex items-center gap-1.5">
+                      <ChevronRight className="w-3 h-3 text-faint" />
+                      <span className="text-emerald-700">
                         {binding.tagType === 'custom_field' 
                           ? `<?php echo get_post_meta($post->ID, '${binding.customFieldName || "field"}', true); ?>`
                           : `<?php ${binding.tagType}(); ?>`
@@ -333,7 +334,7 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
                     </div>
 
                     {binding.originalText && (
-                      <div className="text-[10px] text-zinc-500 truncate">
+                      <div className="text-[10px] text-faint truncate">
                         Replaces: "{binding.originalText}"
                       </div>
                     )}
@@ -346,36 +347,36 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
 
         {/* Customizer Drawer */}
         {showCustomizer && (
-          <div className="w-72 bg-[#0d0d10] border-r border-zinc-800/80 p-4 overflow-y-auto space-y-4 text-xs shrink-0">
-            <div className="font-bold text-zinc-200 uppercase tracking-wider text-[11px] pb-2 border-b border-zinc-800 flex items-center gap-2">
-              <Sliders className="w-3.5 h-3.5 text-amber-400" />
+          <div className="w-72 bg-inset border-r border-line p-4 overflow-y-auto space-y-4 text-xs shrink-0">
+            <div className="font-bold text-ink-2 uppercase tracking-wider text-[11px] pb-2 border-b border-line flex items-center gap-2">
+              <Sliders className="w-3.5 h-3.5 text-accent-ink" />
               <span>Simulated WP Customizer</span>
             </div>
 
             <div>
-              <label className="block text-zinc-400 font-medium mb-1">Site Title</label>
+              <label className="block text-muted font-medium mb-1">Site Title</label>
               <input
                 type="text"
                 value={simulatedTitle}
                 onChange={(e) => setSimulatedTitle(e.target.value)}
-                className="w-full bg-[#09090b] border border-zinc-750 rounded-lg p-2 text-zinc-100 outline-none focus:border-amber-500 transition-colors"
+                className="w-full bg-inset border border-line rounded-lg p-2 text-ink outline-none focus:border-accent transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-zinc-400 font-medium mb-1">Tagline</label>
+              <label className="block text-muted font-medium mb-1">Tagline</label>
               <input
                 type="text"
                 value={simulatedTagline}
                 onChange={(e) => setSimulatedTagline(e.target.value)}
-                className="w-full bg-[#09090b] border border-zinc-750 rounded-lg p-2 text-zinc-100 outline-none focus:border-amber-500 transition-colors"
+                className="w-full bg-inset border border-line rounded-lg p-2 text-ink outline-none focus:border-accent transition-colors"
               />
             </div>
 
-            <div className="p-3 bg-[#09090b] border border-zinc-800 rounded-xl">
-              <div className="font-semibold text-zinc-200 mb-1">Active Menu Location:</div>
-              <div className="text-zinc-400 text-[11px]">Primary Navigation Menu</div>
-              <ul className="mt-2 space-y-1 text-amber-400/90 text-[11px]">
+            <div className="p-3 bg-inset border border-line rounded-xl">
+              <div className="font-semibold text-ink-2 mb-1">Active Menu Location:</div>
+              <div className="text-muted text-[11px]">Primary Navigation Menu</div>
+              <ul className="mt-2 space-y-1 text-accent-ink/90 text-[11px]">
                 <li>&bull; Home (Front Page)</li>
                 <li>&bull; Work / Portfolio</li>
                 <li>&bull; Services</li>
@@ -384,17 +385,17 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
               </ul>
             </div>
 
-            <div className="p-3 bg-[#09090b] border border-zinc-800 rounded-xl">
-              <div className="font-semibold text-zinc-200 mb-1">Active Sidebars:</div>
-              <div className="text-zinc-400 text-[11px]">Primary Sidebar (3 Widgets Active)</div>
+            <div className="p-3 bg-inset border border-line rounded-xl">
+              <div className="font-semibold text-ink-2 mb-1">Active Sidebars:</div>
+              <div className="text-muted text-[11px]">Primary Sidebar (3 Widgets Active)</div>
             </div>
           </div>
         )}
 
         {/* Viewport Frame */}
-        <div className="flex-1 bg-[#060608] p-4 flex items-center justify-center overflow-auto">
+        <div className="flex-1 bg-inset p-4 flex items-center justify-center overflow-auto">
           <div
-            className={`h-full bg-[#0e0e12] border border-zinc-800/90 rounded-2xl shadow-2xl overflow-y-auto transition-all relative ${
+            className={`h-full bg-island border border-line rounded-2xl shadow-2xl overflow-y-auto transition-all relative ${
               viewport === 'desktop'
                 ? 'w-full'
                 : viewport === 'tablet'
@@ -403,16 +404,16 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
             } ${inspectMode ? 'cursor-crosshair select-none' : ''}`}
           >
             {/* Simulated WP Admin Bar */}
-            <div className="bg-[#121216] text-zinc-300 text-[11px] px-3 py-1.5 flex items-center justify-between border-b border-zinc-800 sticky top-0 z-50 select-none">
+            <div className="bg-island text-ink-2 text-[11px] px-3 py-1.5 flex items-center justify-between border-b border-line sticky top-0 z-50 select-none">
               <div className="flex items-center gap-3">
-                <span className="font-bold text-white flex items-center gap-1.5">
-                  <span className="w-4 h-4 rounded-full bg-amber-500 text-black font-serif-luxury font-black flex items-center justify-center text-[10px]">W</span>
+                <span className="font-bold text-ink flex items-center gap-1.5">
+                  <span className="w-4 h-4 rounded-full bg-accent text-white font-serif-luxury font-black flex items-center justify-center text-[10px]">W</span>
                   <span>{simulatedTitle}</span>
                 </span>
-                <span className="hidden sm:inline text-zinc-400">&bull; Customize</span>
-                <span className="hidden sm:inline text-zinc-400">&bull; + New Post</span>
+                <span className="hidden sm:inline text-muted">&bull; Customize</span>
+                <span className="hidden sm:inline text-muted">&bull; + New Post</span>
               </div>
-              <div className="flex items-center gap-2 text-zinc-400">
+              <div className="flex items-center gap-2 text-muted">
                 <span>Howdy, Admin</span>
               </div>
             </div>
@@ -421,7 +422,8 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
             <style dangerouslySetInnerHTML={{ __html: previewCss }} />
 
             {/* Rendered WP Template based on selection */}
-            <div className="theme-preview-container">
+            {/* contain: paint keeps fixed/sticky theme elements (e.g. headers) inside the preview */}
+            <div className="theme-preview-container relative isolate [contain:paint]">
               {/* Header */}
               <header 
                 className={`site-header ${inspectMode ? 'hover:outline hover:outline-2 hover:outline-dashed hover:outline-amber-400' : ''}`}
@@ -688,79 +690,79 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
 
       {/* Point & Click Tag Binding Modal */}
       {bindingModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-[#121218] border border-amber-500/30 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-island border border-accent/30 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="px-5 py-3.5 border-b border-zinc-800 bg-[#0d0d12] flex items-center justify-between">
+            <div className="px-5 py-3.5 border-b border-line bg-island flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-amber-500/10 text-amber-400 rounded-lg border border-amber-500/20">
+                <div className="p-1.5 bg-accent/10 text-accent-ink rounded-lg border border-accent/20">
                   <Tag className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white">Bind Element to WordPress PHP Tag</h3>
-                  <p className="text-[11px] text-zinc-400">Replaces static element with dynamic WordPress logic</p>
+                  <h3 className="text-sm font-bold text-ink">Bind Element to WordPress PHP Tag</h3>
+                  <p className="text-[11px] text-muted">Replaces static element with dynamic WordPress logic</p>
                 </div>
               </div>
               <button
                 onClick={() => setBindingModalOpen(false)}
-                className="text-zinc-400 hover:text-white p-1"
+                className="text-muted hover:text-ink p-1"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Body */}
-            <div className="p-5 space-y-4 text-xs text-zinc-300">
+            <div className="p-5 space-y-4 text-xs text-ink-2">
               <div>
-                <label className="block text-zinc-400 font-medium mb-1">Target CSS Selector</label>
+                <label className="block text-muted font-medium mb-1">Target CSS Selector</label>
                 <input
                   type="text"
                   value={selectedSelector}
                   onChange={(e) => setSelectedSelector(e.target.value)}
-                  className="w-full bg-[#09090b] border border-zinc-750 rounded-lg p-2 font-mono text-amber-300 text-xs outline-none focus:border-amber-500"
+                  className="w-full bg-inset border border-line rounded-lg p-2 font-mono text-accent-ink text-xs outline-none focus:border-accent"
                 />
               </div>
 
               {selectedOriginalText && (
-                <div className="p-2.5 bg-[#09090b] border border-zinc-800 rounded-lg">
-                  <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold block mb-1">Original Text in HTML:</span>
-                  <span className="text-zinc-300 italic text-xs font-serif">"{selectedOriginalText}"</span>
+                <div className="p-2.5 bg-inset border border-line rounded-lg">
+                  <span className="text-[10px] uppercase tracking-wider text-faint font-bold block mb-1">Original Text in HTML:</span>
+                  <span className="text-ink-2 italic text-xs font-serif">"{selectedOriginalText}"</span>
                 </div>
               )}
 
               <div>
-                <label className="block text-zinc-400 font-medium mb-1.5">Choose WordPress Template Tag</label>
+                <label className="block text-muted font-medium mb-1.5">Choose WordPress Template Tag</label>
                 <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
                   {[
-                    { id: 'the_title', label: 'the_title()', desc: 'Post / Page Title', color: 'text-amber-400' },
-                    { id: 'the_content', label: 'the_content()', desc: 'Main Body Content', color: 'text-blue-400' },
-                    { id: 'the_excerpt', label: 'the_excerpt()', desc: 'Post Excerpt / Summary', color: 'text-emerald-400' },
-                    { id: 'the_post_thumbnail', label: 'the_post_thumbnail()', desc: 'Featured Post Image', color: 'text-purple-400' },
-                    { id: 'the_author', label: 'the_author()', desc: 'Post Author Name', color: 'text-cyan-400' },
-                    { id: 'the_date', label: 'the_time() / the_date()', desc: 'Published Date', color: 'text-rose-400' },
-                    { id: 'the_permalink', label: 'the_permalink()', desc: 'Post Link URL', color: 'text-indigo-400' },
-                    { id: 'bloginfo_name', label: 'bloginfo("name")', desc: 'Site Name', color: 'text-amber-300' },
-                    { id: 'bloginfo_description', label: 'bloginfo("description")', desc: 'Site Tagline', color: 'text-zinc-300' },
-                    { id: 'wp_nav_menu', label: 'wp_nav_menu()', desc: 'Primary Nav Menu', color: 'text-emerald-300' },
-                    { id: 'dynamic_sidebar', label: 'dynamic_sidebar()', desc: 'Sidebar Widget Area', color: 'text-violet-400' },
-                    { id: 'woocommerce_price', label: 'woocommerce_price()', desc: 'Woo Product Price', color: 'text-purple-300' },
-                    { id: 'woocommerce_add_to_cart', label: 'add_to_cart_button', desc: 'WooCommerce Button', color: 'text-purple-300' },
-                    { id: 'custom_field', label: 'get_post_meta() / ACF', desc: 'Custom Field Meta', color: 'text-amber-400' },
+                    { id: 'the_title', label: 'the_title()', desc: 'Post / Page Title', color: 'text-accent-ink' },
+                    { id: 'the_content', label: 'the_content()', desc: 'Main Body Content', color: 'text-blue-700' },
+                    { id: 'the_excerpt', label: 'the_excerpt()', desc: 'Post Excerpt / Summary', color: 'text-emerald-700' },
+                    { id: 'the_post_thumbnail', label: 'the_post_thumbnail()', desc: 'Featured Post Image', color: 'text-purple-700' },
+                    { id: 'the_author', label: 'the_author()', desc: 'Post Author Name', color: 'text-cyan-700' },
+                    { id: 'the_date', label: 'the_time() / the_date()', desc: 'Published Date', color: 'text-rose-700' },
+                    { id: 'the_permalink', label: 'the_permalink()', desc: 'Post Link URL', color: 'text-indigo-700' },
+                    { id: 'bloginfo_name', label: 'bloginfo("name")', desc: 'Site Name', color: 'text-accent-ink' },
+                    { id: 'bloginfo_description', label: 'bloginfo("description")', desc: 'Site Tagline', color: 'text-ink-2' },
+                    { id: 'wp_nav_menu', label: 'wp_nav_menu()', desc: 'Primary Nav Menu', color: 'text-emerald-700' },
+                    { id: 'dynamic_sidebar', label: 'dynamic_sidebar()', desc: 'Sidebar Widget Area', color: 'text-violet-700' },
+                    { id: 'woocommerce_price', label: 'woocommerce_price()', desc: 'Woo Product Price', color: 'text-purple-700' },
+                    { id: 'woocommerce_add_to_cart', label: 'add_to_cart_button', desc: 'WooCommerce Button', color: 'text-purple-700' },
+                    { id: 'custom_field', label: 'get_post_meta() / ACF', desc: 'Custom Field Meta', color: 'text-accent-ink' },
                   ].map((tag) => (
                     <label
                       key={tag.id}
                       onClick={() => setSelectedTagType(tag.id as any)}
                       className={`p-2.5 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
                         selectedTagType === tag.id
-                          ? 'bg-amber-500/15 border-amber-500 text-white'
-                          : 'bg-[#09090b] border-zinc-800 hover:border-zinc-700 text-zinc-300'
+                          ? 'bg-accent/15 border-accent text-ink'
+                          : 'bg-inset border-line hover:border-line text-ink-2'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <span className={`font-mono font-bold text-[11px] ${tag.color}`}>{tag.label}</span>
-                        {selectedTagType === tag.id && <Check className="w-3.5 h-3.5 text-amber-400" />}
+                        {selectedTagType === tag.id && <Check className="w-3.5 h-3.5 text-accent-ink" />}
                       </div>
-                      <span className="text-[10px] text-zinc-400 mt-1">{tag.desc}</span>
+                      <span className="text-[10px] text-muted mt-1">{tag.desc}</span>
                     </label>
                   ))}
                 </div>
@@ -768,29 +770,29 @@ export const ThemeLivePreview: React.FC<ThemeLivePreviewProps> = ({
 
               {selectedTagType === 'custom_field' && (
                 <div>
-                  <label className="block text-zinc-400 font-medium mb-1">Custom Field Key / Name</label>
+                  <label className="block text-muted font-medium mb-1">Custom Field Key / Name</label>
                   <input
                     type="text"
                     value={customFieldName}
                     onChange={(e) => setCustomFieldName(e.target.value)}
                     placeholder="e.g. hero_subtitle, client_company, rating"
-                    className="w-full bg-[#09090b] border border-zinc-750 rounded-lg p-2 font-mono text-xs text-white outline-none focus:border-amber-500"
+                    className="w-full bg-inset border border-line rounded-lg p-2 font-mono text-xs text-ink outline-none focus:border-accent"
                   />
                 </div>
               )}
             </div>
 
             {/* Footer */}
-            <div className="px-5 py-3 border-t border-zinc-800 bg-[#0d0d12] flex items-center justify-end gap-2">
+            <div className="px-5 py-3 border-t border-line bg-island flex items-center justify-end gap-2">
               <button
                 onClick={() => setBindingModalOpen(false)}
-                className="px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white rounded-lg"
+                className="px-4 py-2 text-xs font-medium text-muted hover:text-ink rounded-lg"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveBinding}
-                className="px-4 py-2 text-xs font-bold text-black bg-amber-500 hover:bg-amber-400 rounded-lg shadow transition-colors flex items-center gap-1.5"
+                className="px-4 py-2 text-xs font-bold text-white bg-accent hover:bg-accent rounded-lg shadow transition-colors flex items-center gap-1.5"
               >
                 <Check className="w-3.5 h-3.5" />
                 <span>Apply Tag Binding</span>

@@ -113,9 +113,9 @@ if ( function_exists( 'the_custom_logo' ) && has_custom_logo() ) {
 
 export const QuickSnippetToolbar: React.FC<QuickSnippetToolbarProps> = ({ onInsertSnippet }) => {
   return (
-    <div className="bg-[#090b11] border-b border-white/[0.06] px-3 py-1.5 flex items-center gap-2 overflow-x-auto text-xs scrollbar-none">
-      <div className="flex items-center gap-1 text-[11px] font-bold text-zinc-400 uppercase tracking-wider shrink-0 mr-1">
-        <Zap className="w-3 h-3 text-amber-400" />
+    <div className="bg-inset border-b border-line px-3 py-1.5 flex items-center gap-2 overflow-x-auto text-xs scrollbar-none">
+      <div className="flex items-center gap-1 text-[11px] font-bold text-muted uppercase tracking-wider shrink-0 mr-1">
+        <Zap className="w-3 h-3 text-accent-ink" />
         <span>Quick Snippets:</span>
       </div>
 
@@ -124,10 +124,10 @@ export const QuickSnippetToolbar: React.FC<QuickSnippetToolbarProps> = ({ onInse
           <button
             key={idx}
             onClick={() => onInsertSnippet(snip.snippet)}
-            className="flex items-center gap-1 px-2.5 py-1 bg-[#0e111a] hover:bg-zinc-800 text-zinc-300 hover:text-amber-300 border border-white/[0.06] hover:border-amber-500/30 rounded-lg text-xs transition-all shrink-0 active:scale-95 group font-medium"
+            className="flex items-center gap-1 px-2.5 py-1 bg-island hover:bg-inset text-ink-2 hover:text-accent-ink border border-line hover:border-accent/30 rounded-lg text-xs transition-all shrink-0 active:scale-95 group font-medium"
             title={snip.description}
           >
-            <Plus className="w-3 h-3 text-amber-400 group-hover:rotate-90 transition-transform duration-200" />
+            <Plus className="w-3 h-3 text-accent-ink group-hover:rotate-90 transition-transform duration-200" />
             <span>{snip.label}</span>
           </button>
         ))}

@@ -1,6 +1,6 @@
 import JSZip from 'jszip';
 import { WordPressThemeFile, WordPressThemeMeta } from '../types';
-import { sanitizeSlug } from './converter';
+import { sanitizeSlug, toPhpPrefix } from './converter/php';
 
 /**
  * Generates a clean 1200x900 screenshot.png data URL for WordPress themes
@@ -201,7 +201,7 @@ export async function exportWordPressChildThemeZip(
     throw new Error('Failed to create child theme directory inside zip');
   }
 
-  const prefix = sanitizeSlug(meta.textDomain || parentSlug).replace(/-/g, '_');
+  const prefix = toPhpPrefix(meta.textDomain || parentSlug);
 
   // 1. Child style.css with parent template declaration
   const childStyleCss = `/*
@@ -318,7 +318,12 @@ export async function exportWordPressThemeZip(
 
   // Add all theme files
   files.forEach((file) => {
-    themeFolder.file(file.path, file.content);
+    if (file.encoding === 'dataurl') {
+      // data:<mime>;base64,<payload>
+      themeFolder.file(file.path, file.content.slice(file.content.indexOf(',') + 1), { base64: true });
+    } else {
+      themeFolder.file(file.path, file.content);
+    }
   });
 
   // Generate and attach screenshot.png

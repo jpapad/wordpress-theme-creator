@@ -1,5 +1,5 @@
 import { WordPressThemeFile, WordPressThemeMeta } from '../types';
-import { sanitizeSlug } from './converter';
+import { sanitizeSlug, toPhpPrefix } from './converter/php';
 
 /**
  * Generates a valid GNU gettext Portable Object Template (.pot) file
@@ -85,7 +85,7 @@ msgstr ""
  * Generates Asset Optimizer and Enqueue helper for fast performance
  */
 export function generateAssetOptimizerPhp(meta: WordPressThemeMeta): WordPressThemeFile {
-  const prefix = sanitizeSlug(meta.textDomain || meta.name);
+  const prefix = toPhpPrefix(meta.textDomain || meta.name);
 
   const phpContent = `<?php
 /**

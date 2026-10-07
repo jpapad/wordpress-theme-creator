@@ -238,39 +238,39 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-[#10121a] border border-white/10 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden text-zinc-200 animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-md flex items-center justify-center p-4">
+      <div className="bg-island border border-line rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden text-ink-2 animate-in fade-in zoom-in-95 duration-200">
         
         {/* Header */}
-        <div className="px-6 py-4 border-b border-white/[0.08] flex items-center justify-between bg-[#0b0d14]">
+        <div className="px-6 py-4 border-b border-line flex items-center justify-between bg-island">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400">
+            <div className="w-8 h-8 rounded-xl bg-accent/10 border border-accent/25 flex items-center justify-center text-accent-ink">
               <Sliders className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="font-bold text-white text-base">WordPress Theme Studio &amp; Extension Center</h2>
-              <p className="text-xs text-zinc-400">Configure Elementor, Gutenberg, CPTs, Taxonomies, ACF &amp; Demo Importers</p>
+              <h2 className="font-bold text-ink text-base">WordPress Theme Studio &amp; Extension Center</h2>
+              <p className="text-xs text-muted">Configure Elementor, Gutenberg, CPTs, Taxonomies, ACF &amp; Demo Importers</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/[0.06] transition-colors"
+            className="p-2 text-muted hover:text-ink rounded-lg hover:bg-ink/[0.06] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex border-b border-white/[0.08] bg-[#0e1017] px-4 overflow-x-auto no-scrollbar gap-1">
+        <div className="flex border-b border-line bg-island px-4 overflow-x-auto no-scrollbar gap-1">
           <button
             onClick={() => setActiveTab('elementor')}
             className={`flex items-center gap-2 px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
               activeTab === 'elementor'
-                ? 'border-amber-400 text-amber-300 bg-white/[0.03]'
-                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                ? 'border-accent text-accent-ink bg-ink/[0.03]'
+                : 'border-transparent text-muted hover:text-ink-2'
             }`}
           >
-            <Component className="w-3.5 h-3.5 text-rose-400" />
+            <Component className="w-3.5 h-3.5 text-rose-700" />
             <span>Elementor Studio</span>
           </button>
 
@@ -278,11 +278,11 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
             onClick={() => setActiveTab('cpt')}
             className={`flex items-center gap-2 px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
               activeTab === 'cpt'
-                ? 'border-amber-400 text-amber-300 bg-white/[0.03]'
-                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                ? 'border-accent text-accent-ink bg-ink/[0.03]'
+                : 'border-transparent text-muted hover:text-ink-2'
             }`}
           >
-            <FolderTree className="w-3.5 h-3.5 text-blue-400" />
+            <FolderTree className="w-3.5 h-3.5 text-blue-700" />
             <span>CPTs &amp; Taxonomies</span>
           </button>
 
@@ -290,11 +290,11 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
             onClick={() => setActiveTab('acf')}
             className={`flex items-center gap-2 px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
               activeTab === 'acf'
-                ? 'border-amber-400 text-amber-300 bg-white/[0.03]'
-                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                ? 'border-accent text-accent-ink bg-ink/[0.03]'
+                : 'border-transparent text-muted hover:text-ink-2'
             }`}
           >
-            <Database className="w-3.5 h-3.5 text-emerald-400" />
+            <Database className="w-3.5 h-3.5 text-emerald-700" />
             <span>ACF Custom Fields</span>
           </button>
 
@@ -302,11 +302,11 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
             onClick={() => setActiveTab('gutenberg')}
             className={`flex items-center gap-2 px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
               activeTab === 'gutenberg'
-                ? 'border-amber-400 text-amber-300 bg-white/[0.03]'
-                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                ? 'border-accent text-accent-ink bg-ink/[0.03]'
+                : 'border-transparent text-muted hover:text-ink-2'
             }`}
           >
-            <Boxes className="w-3.5 h-3.5 text-indigo-400" />
+            <Boxes className="w-3.5 h-3.5 text-indigo-700" />
             <span>Gutenberg &amp; theme.json</span>
           </button>
 
@@ -314,11 +314,11 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
             onClick={() => setActiveTab('demo-i18n')}
             className={`flex items-center gap-2 px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
               activeTab === 'demo-i18n'
-                ? 'border-amber-400 text-amber-300 bg-white/[0.03]'
-                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                ? 'border-accent text-accent-ink bg-ink/[0.03]'
+                : 'border-transparent text-muted hover:text-ink-2'
             }`}
           >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-amber-400" />
+            <FileSpreadsheet className="w-3.5 h-3.5 text-accent-ink" />
             <span>Demo Data (WXR) &amp; i18n</span>
           </button>
 
@@ -326,11 +326,11 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
             onClick={() => setActiveTab('menus-widgets')}
             className={`flex items-center gap-2 px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
               activeTab === 'menus-widgets'
-                ? 'border-amber-400 text-amber-300 bg-white/[0.03]'
-                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                ? 'border-accent text-accent-ink bg-ink/[0.03]'
+                : 'border-transparent text-muted hover:text-ink-2'
             }`}
           >
-            <Layout className="w-3.5 h-3.5 text-cyan-400" />
+            <Layout className="w-3.5 h-3.5 text-cyan-700" />
             <span>Menus &amp; Sidebars</span>
           </button>
 
@@ -338,11 +338,11 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
             onClick={() => setActiveTab('general')}
             className={`flex items-center gap-2 px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
               activeTab === 'general'
-                ? 'border-amber-400 text-amber-300 bg-white/[0.03]'
-                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                ? 'border-accent text-accent-ink bg-ink/[0.03]'
+                : 'border-transparent text-muted hover:text-ink-2'
             }`}
           >
-            <Settings2 className="w-3.5 h-3.5 text-zinc-400" />
+            <Settings2 className="w-3.5 h-3.5 text-muted" />
             <span>General Meta</span>
           </button>
         </div>
@@ -353,13 +353,13 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
           {/* TAB: ELEMENTOR STUDIO */}
           {activeTab === 'elementor' && (
             <div className="space-y-6">
-              <div className="p-4 rounded-xl bg-gradient-to-r from-rose-950/30 to-amber-950/20 border border-rose-500/20">
+              <div className="p-4 rounded-xl bg-gradient-to-r from-rose-950/30 to-accent/20 border border-rose-500/20">
                 <div className="flex items-start gap-3">
-                  <Component className="w-5 h-5 text-rose-400 mt-0.5" />
+                  <Component className="w-5 h-5 text-rose-700 mt-0.5" />
                   <div>
-                    <h3 className="font-bold text-white text-sm">Full Elementor &amp; Elementor Pro Theme Builder Integration</h3>
-                    <p className="text-xs text-zinc-300 mt-1 leading-relaxed">
-                      Your theme automatically registers <strong>Elementor Theme Builder Locations</strong> (Header, Footer, Single Post, Archive, 404), injects conditional location checks in <code className="text-amber-300 font-mono">header.php</code> and <code className="text-amber-300 font-mono">footer.php</code>, and builds native custom PHP Elementor widgets.
+                    <h3 className="font-bold text-ink text-sm">Full Elementor &amp; Elementor Pro Theme Builder Integration</h3>
+                    <p className="text-xs text-ink-2 mt-1 leading-relaxed">
+                      Your theme automatically registers <strong>Elementor Theme Builder Locations</strong> (Header, Footer, Single Post, Archive, 404), injects conditional location checks in <code className="text-accent-ink font-mono">header.php</code> and <code className="text-accent-ink font-mono">footer.php</code>, and builds native custom PHP Elementor widgets.
                     </p>
                   </div>
                 </div>
@@ -367,28 +367,28 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
 
               {/* Elementor Features Toggles */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="p-3.5 rounded-xl bg-[#08090d] border border-white/[0.08]">
+                <div className="p-3.5 rounded-xl bg-inset border border-line">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-semibold text-white">Theme Builder Locations</span>
-                    <span className="px-2 py-0.5 bg-emerald-500/15 text-emerald-300 text-[10px] rounded-md font-bold">ACTIVE</span>
+                    <span className="text-xs font-semibold text-ink">Theme Builder Locations</span>
+                    <span className="px-2 py-0.5 bg-emerald-500/15 text-emerald-700 text-[10px] rounded-md font-bold">ACTIVE</span>
                   </div>
-                  <p className="text-[11px] text-zinc-400">Header, Footer &amp; Single templates replaceable via Elementor Pro.</p>
+                  <p className="text-[11px] text-muted">Header, Footer &amp; Single templates replaceable via Elementor Pro.</p>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-[#08090d] border border-white/[0.08]">
+                <div className="p-3.5 rounded-xl bg-inset border border-line">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-semibold text-white">Elementor Canvas</span>
-                    <span className="px-2 py-0.5 bg-emerald-500/15 text-emerald-300 text-[10px] rounded-md font-bold">READY</span>
+                    <span className="text-xs font-semibold text-ink">Elementor Canvas</span>
+                    <span className="px-2 py-0.5 bg-emerald-500/15 text-emerald-700 text-[10px] rounded-md font-bold">READY</span>
                   </div>
-                  <p className="text-[11px] text-zinc-400">Blank full-width template for landing pages in <code className="text-zinc-300">template-elementor-canvas.php</code>.</p>
+                  <p className="text-[11px] text-muted">Blank full-width template for landing pages in <code className="text-ink-2">template-elementor-canvas.php</code>.</p>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-[#08090d] border border-white/[0.08]">
+                <div className="p-3.5 rounded-xl bg-inset border border-line">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-semibold text-white">Full Width Container</span>
-                    <span className="px-2 py-0.5 bg-emerald-500/15 text-emerald-300 text-[10px] rounded-md font-bold">READY</span>
+                    <span className="text-xs font-semibold text-ink">Full Width Container</span>
+                    <span className="px-2 py-0.5 bg-emerald-500/15 text-emerald-700 text-[10px] rounded-md font-bold">READY</span>
                   </div>
-                  <p className="text-[11px] text-zinc-400">Full-width page layout keeping theme header/footer intact.</p>
+                  <p className="text-[11px] text-muted">Full-width page layout keeping theme header/footer intact.</p>
                 </div>
               </div>
 
@@ -396,39 +396,42 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-bold text-white text-xs uppercase tracking-wider">Custom Elementor Widgets (PHP Widget_Base)</h4>
-                    <p className="text-[11px] text-zinc-400">Native PHP classes created inside <code className="text-amber-400">inc/elementor-widgets/</code></p>
+                    <h4 className="font-bold text-ink text-xs uppercase tracking-wider">Custom Elementor Widgets (PHP Widget_Base)</h4>
+                    <p className="text-[11px] text-muted">Native PHP classes created inside <code className="text-accent-ink">inc/elementor-widgets/</code></p>
                   </div>
                   <button
                     onClick={handleAddElementorWidget}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-500 hover:bg-rose-400 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-rose-500/20"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-500 hover:bg-rose-400 text-ink rounded-lg text-xs font-bold transition-all shadow-md shadow-rose-500/20"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add Custom Widget</span>
                   </button>
                 </div>
 
+                <p className="text-[11px] text-muted">
+                  Every section of your HTML already becomes its own widget automatically. Add widgets here only for extra components.
+                </p>
                 <div className="space-y-2">
-                  {(options.customElementorWidgets || [
-                    { id: '1', name: 'theme_hero_section', title: 'Theme Hero Banner', icon: 'eicon-banner', category: 'theme-elements', fields: [] },
-                    { id: '2', name: 'theme_features_grid', title: 'Theme Features Grid', icon: 'eicon-posts-grid', category: 'theme-elements', fields: [] }
-                  ]).map((widget) => (
+                  {(options.customElementorWidgets || []).length === 0 && (
+                    <div className="p-3.5 border border-dashed border-line-strong rounded-xl text-xs text-muted">No extra widgets.</div>
+                  )}
+                  {(options.customElementorWidgets || []).map((widget) => (
                     <div
                       key={widget.id}
-                      className="p-3.5 bg-[#08090d] border border-white/[0.08] rounded-xl flex items-center justify-between hover:border-white/20 transition-all"
+                      className="p-3.5 bg-inset border border-line rounded-xl flex items-center justify-between hover:border-line transition-all"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/25 flex items-center justify-center text-rose-400">
+                        <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/25 flex items-center justify-center text-rose-700">
                           <Component className="w-4 h-4" />
                         </div>
                         <div>
-                          <div className="font-semibold text-white text-xs">{widget.title}</div>
-                          <div className="text-[11px] text-zinc-400 font-mono mt-0.5">
-                            Class: <code className="text-rose-300">class-elementor-{widget.name.replace(/_/g, '-')}-widget.php</code>
+                          <div className="font-semibold text-ink text-xs">{widget.title}</div>
+                          <div className="text-[11px] text-muted font-mono mt-0.5">
+                            File: <code className="text-rose-700">inc/elementor-widgets/class-custom-{widget.name.replace(/_/g, '-')}.php</code>
                           </div>
                         </div>
                       </div>
-                      <span className="text-[10px] px-2 py-0.5 bg-zinc-800 text-zinc-300 rounded font-mono">
+                      <span className="text-[10px] px-2 py-0.5 bg-inset text-ink-2 rounded font-mono">
                         category: theme-elements
                       </span>
                     </div>
@@ -445,12 +448,12 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-bold text-white text-sm">Custom Post Types (CPT)</h3>
-                    <p className="text-xs text-zinc-400">Generates register_post_type(), single-[cpt].php &amp; archive-[cpt].php</p>
+                    <h3 className="font-bold text-ink text-sm">Custom Post Types (CPT)</h3>
+                    <p className="text-xs text-muted">Generates register_post_type(), single-[cpt].php &amp; archive-[cpt].php</p>
                   </div>
                   <button
                     onClick={handleAddCPT}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 hover:bg-blue-400 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-blue-500/20"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 hover:bg-blue-400 text-ink rounded-lg text-xs font-bold transition-all shadow-md shadow-blue-500/20"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add Custom Post Type</span>
@@ -461,22 +464,22 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
                   {options.customPostTypes.map((cpt) => (
                     <div
                       key={cpt.id}
-                      className="p-3.5 bg-[#08090d] border border-white/[0.08] rounded-xl flex items-center justify-between"
+                      className="p-3.5 bg-inset border border-line rounded-xl flex items-center justify-between"
                     >
                       <div>
-                        <div className="font-semibold text-white flex items-center gap-2 text-xs">
+                        <div className="font-semibold text-ink flex items-center gap-2 text-xs">
                           <span>{cpt.pluralName}</span>
-                          <code className="text-[10px] px-1.5 py-0.2 bg-zinc-800 text-amber-300 rounded font-mono">
+                          <code className="text-[10px] px-1.5 py-0.2 bg-inset text-accent-ink rounded font-mono">
                             {cpt.slug}
                           </code>
                         </div>
-                        <div className="text-[11px] text-zinc-400 mt-1">
-                          Singular: <strong className="text-zinc-300">{cpt.singularName}</strong> &bull; Supports: {cpt.supports.join(', ')}
+                        <div className="text-[11px] text-muted mt-1">
+                          Singular: <strong className="text-ink-2">{cpt.singularName}</strong> &bull; Supports: {cpt.supports.join(', ')}
                         </div>
                       </div>
                       <button
                         onClick={() => handleRemoveCPT(cpt.id)}
-                        className="p-1.5 text-zinc-500 hover:text-rose-400 hover:bg-zinc-800 rounded transition-colors"
+                        className="p-1.5 text-faint hover:text-rose-700 hover:bg-inset rounded transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -486,15 +489,15 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
               </div>
 
               {/* Taxonomies Section */}
-              <div className="space-y-3 pt-4 border-t border-white/[0.08]">
+              <div className="space-y-3 pt-4 border-t border-line">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-bold text-white text-sm">Custom Taxonomies (Categories &amp; Tags)</h3>
-                    <p className="text-xs text-zinc-400">Generates register_taxonomy() linked to your post types</p>
+                    <h3 className="font-bold text-ink text-sm">Custom Taxonomies (Categories &amp; Tags)</h3>
+                    <p className="text-xs text-muted">Generates register_taxonomy() linked to your post types</p>
                   </div>
                   <button
                     onClick={handleAddTaxonomy}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-400 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-indigo-500/20"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-400 text-ink rounded-lg text-xs font-bold transition-all shadow-md shadow-indigo-500/20"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add Taxonomy</span>
@@ -508,22 +511,22 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
                   ]).map((tax) => (
                     <div
                       key={tax.id}
-                      className="p-3.5 bg-[#08090d] border border-white/[0.08] rounded-xl flex items-center justify-between"
+                      className="p-3.5 bg-inset border border-line rounded-xl flex items-center justify-between"
                     >
                       <div>
-                        <div className="font-semibold text-white flex items-center gap-2 text-xs">
+                        <div className="font-semibold text-ink flex items-center gap-2 text-xs">
                           <span>{tax.pluralName}</span>
-                          <code className="text-[10px] px-1.5 py-0.2 bg-zinc-800 text-indigo-300 rounded font-mono">
+                          <code className="text-[10px] px-1.5 py-0.2 bg-inset text-indigo-700 rounded font-mono">
                             {tax.slug}
                           </code>
-                          <span className="text-[10px] px-1.5 py-0.2 bg-white/[0.05] text-zinc-400 rounded">
+                          <span className="text-[10px] px-1.5 py-0.2 bg-ink/[0.05] text-muted rounded">
                             {tax.hierarchical ? 'Category (Hierarchical)' : 'Tag (Flat)'}
                           </span>
                         </div>
                       </div>
                       <button
                         onClick={() => handleRemoveTaxonomy(tax.id)}
-                        className="p-1.5 text-zinc-500 hover:text-rose-400 hover:bg-zinc-800 rounded transition-colors"
+                        className="p-1.5 text-faint hover:text-rose-700 hover:bg-inset rounded transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -539,14 +542,14 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-bold text-white text-sm">Advanced Custom Fields (ACF) Visual Builder</h3>
-                  <p className="text-xs text-zinc-400">
-                    Exports <code className="text-emerald-400">acf-json/group_theme_fields.json</code> for instant sync inside ACF plugin.
+                  <h3 className="font-bold text-ink text-sm">Advanced Custom Fields (ACF) Visual Builder</h3>
+                  <p className="text-xs text-muted">
+                    Exports <code className="text-emerald-700">acf-json/group_theme_fields.json</code> for instant sync inside ACF plugin.
                   </p>
                 </div>
                 <button
                   onClick={handleAddAcfField}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-black rounded-lg text-xs font-bold transition-all shadow-md shadow-emerald-500/20"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-emerald-500/20"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add ACF Field</span>
@@ -554,31 +557,32 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
               </div>
 
               <div className="space-y-2">
-                {(options.customFields && options.customFields.length > 0 ? options.customFields : [
-                  { id: '1', name: 'hero_subtitle', label: 'Hero Subtitle', type: 'textarea', instructions: 'Custom subheading for hero block.' },
-                  { id: '2', name: 'client_name', label: 'Client Name', type: 'text', instructions: 'Client or company name for portfolio.' },
-                  { id: '3', name: 'project_rating', label: 'Project Review Stars', type: 'number', instructions: 'Numeric star rating (1-5).' },
-                  { id: '4', name: 'cta_button_url', label: 'CTA Button URL', type: 'url', instructions: 'Direct destination link.' }
-                ]).map((field) => (
+                <p className="text-[11px] text-muted">
+                  Texts, buttons and images of your sections become ACF fields automatically. Add fields here for extra data (exported to acf-json/).
+                </p>
+                {(options.customFields || []).length === 0 && (
+                  <div className="p-3.5 border border-dashed border-line-strong rounded-xl text-xs text-muted">No extra fields.</div>
+                )}
+                {(options.customFields || []).map((field) => (
                   <div
                     key={field.id}
-                    className="p-3.5 bg-[#08090d] border border-white/[0.08] rounded-xl flex items-center justify-between"
+                    className="p-3.5 bg-inset border border-line rounded-xl flex items-center justify-between"
                   >
                     <div>
-                      <div className="font-semibold text-white flex items-center gap-2 text-xs">
+                      <div className="font-semibold text-ink flex items-center gap-2 text-xs">
                         <span>{field.label}</span>
-                        <code className="text-[10px] px-1.5 py-0.2 bg-zinc-800 text-emerald-300 rounded font-mono">
+                        <code className="text-[10px] px-1.5 py-0.2 bg-inset text-emerald-700 rounded font-mono">
                           get_field('{field.name}')
                         </code>
-                        <span className="text-[10px] px-1.5 py-0.2 bg-white/[0.05] text-zinc-400 rounded uppercase font-mono">
+                        <span className="text-[10px] px-1.5 py-0.2 bg-ink/[0.05] text-muted rounded uppercase font-mono">
                           {field.type}
                         </span>
                       </div>
-                      <div className="text-[11px] text-zinc-400 mt-1">{field.instructions}</div>
+                      <div className="text-[11px] text-muted mt-1">{field.instructions}</div>
                     </div>
                     <button
                       onClick={() => handleRemoveAcfField(field.id)}
-                      className="p-1.5 text-zinc-500 hover:text-rose-400 hover:bg-zinc-800 rounded transition-colors"
+                      className="p-1.5 text-faint hover:text-rose-700 hover:bg-inset rounded transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -591,25 +595,25 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
           {/* TAB: GUTENBERG & THEME.JSON */}
           {activeTab === 'gutenberg' && (
             <div className="space-y-6">
-              <div className="p-4 rounded-xl bg-indigo-950/30 border border-indigo-500/20">
-                <h3 className="font-bold text-white text-sm flex items-center gap-2">
-                  <Boxes className="w-4 h-4 text-indigo-400" />
+              <div className="p-4 rounded-xl bg-indigo-50 border border-indigo-500/20">
+                <h3 className="font-bold text-ink text-sm flex items-center gap-2">
+                  <Boxes className="w-4 h-4 text-indigo-700" />
                   <span>WordPress 6.x Full Site Editing (FSE) &amp; block.json</span>
                 </h3>
-                <p className="text-xs text-zinc-300 mt-1 leading-relaxed">
-                  Generates native <code className="text-indigo-300 font-mono">theme.json</code> with global color presets, typography scaling, fluid spacing, and custom <code className="text-indigo-300 font-mono">block.json</code> blocks inside <code className="text-indigo-300 font-mono">blocks/</code>.
+                <p className="text-xs text-ink-2 mt-1 leading-relaxed">
+                  Generates native <code className="text-indigo-700 font-mono">theme.json</code> with global color presets, typography scaling, fluid spacing, and custom <code className="text-indigo-700 font-mono">block.json</code> blocks inside <code className="text-indigo-700 font-mono">blocks/</code>.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="p-3.5 bg-[#08090d] border border-white/[0.08] rounded-xl">
-                  <div className="font-bold text-white text-xs mb-1">blocks/hero-banner/</div>
-                  <p className="text-[11px] text-zinc-400">Native block with block.json manifest &amp; server-side render.php</p>
+                <div className="p-3.5 bg-inset border border-line rounded-xl">
+                  <div className="font-bold text-ink text-xs mb-1">blocks/hero-banner/</div>
+                  <p className="text-[11px] text-muted">Native block with block.json manifest &amp; server-side render.php</p>
                 </div>
 
-                <div className="p-3.5 bg-[#08090d] border border-white/[0.08] rounded-xl">
-                  <div className="font-bold text-white text-xs mb-1">blocks/feature-grid/</div>
-                  <p className="text-[11px] text-zinc-400">3-Column responsive card grid block with color &amp; align-wide supports</p>
+                <div className="p-3.5 bg-inset border border-line rounded-xl">
+                  <div className="font-bold text-ink text-xs mb-1">blocks/feature-grid/</div>
+                  <p className="text-[11px] text-muted">3-Column responsive card grid block with color &amp; align-wide supports</p>
                 </div>
               </div>
             </div>
@@ -619,11 +623,11 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
           {activeTab === 'demo-i18n' && (
             <div className="space-y-6">
               <div className="space-y-3">
-                <h3 className="font-bold text-white text-sm flex items-center gap-2">
-                  <FileSpreadsheet className="w-4 h-4 text-amber-400" />
+                <h3 className="font-bold text-ink text-sm flex items-center gap-2">
+                  <FileSpreadsheet className="w-4 h-4 text-accent-ink" />
                   <span>One-Click Demo Content Importer (WXR XML 1.2)</span>
                 </h3>
-                <div className="p-4 bg-[#08090d] border border-white/[0.08] rounded-xl text-xs space-y-2 text-zinc-300">
+                <div className="p-4 bg-inset border border-line rounded-xl text-xs space-y-2 text-ink-2">
                   <p>
                     <strong>demo-data/content.xml:</strong> An export XML containing all pages, posts, and navigation menus extracted from your HTML mockups.
                   </p>
@@ -633,12 +637,12 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
                 </div>
               </div>
 
-              <div className="space-y-3 pt-4 border-t border-white/[0.08]">
-                <h3 className="font-bold text-white text-sm flex items-center gap-2">
-                  <Globe2 className="w-4 h-4 text-cyan-400" />
+              <div className="space-y-3 pt-4 border-t border-line">
+                <h3 className="font-bold text-ink text-sm flex items-center gap-2">
+                  <Globe2 className="w-4 h-4 text-cyan-700" />
                   <span>Localization &amp; POT File Generator (i18n)</span>
                 </h3>
-                <div className="p-4 bg-[#08090d] border border-white/[0.08] rounded-xl text-xs space-y-2 text-zinc-300">
+                <div className="p-4 bg-inset border border-line rounded-xl text-xs space-y-2 text-ink-2">
                   <p>
                     <strong>languages/{meta.textDomain || 'theme'}.pot:</strong> Standard GNU gettext catalog with auto-scanned strings for 100% translation readiness with WPML, Polylang, and Loco Translate.
                   </p>
@@ -654,12 +658,12 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-white text-xs uppercase tracking-wider">Navigation Menu Locations</h3>
-                    <p className="text-[11px] text-zinc-400">Registered with register_nav_menus()</p>
+                    <h3 className="font-semibold text-ink text-xs uppercase tracking-wider">Navigation Menu Locations</h3>
+                    <p className="text-[11px] text-muted">Registered with register_nav_menus()</p>
                   </div>
                   <button
                     onClick={handleAddMenuLocation}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg text-xs font-semibold transition-colors border border-white/10"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-inset hover:bg-line text-ink-2 rounded-lg text-xs font-semibold transition-colors border border-line"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add Menu</span>
@@ -670,15 +674,15 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
                   {options.menuLocations.map((m) => (
                     <div
                       key={m.id}
-                      className="p-3 bg-[#08090d] border border-white/[0.08] rounded-xl flex items-center justify-between"
+                      className="p-3 bg-inset border border-line rounded-xl flex items-center justify-between"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-zinc-200 text-xs">{m.name}</span>
-                        <code className="text-[10px] text-amber-400 font-mono">({m.slug})</code>
+                        <span className="font-medium text-ink-2 text-xs">{m.name}</span>
+                        <code className="text-[10px] text-accent-ink font-mono">({m.slug})</code>
                       </div>
                       <button
                         onClick={() => handleRemoveMenuLocation(m.id)}
-                        className="text-zinc-500 hover:text-rose-400 p-1"
+                        className="text-faint hover:text-rose-700 p-1"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -688,15 +692,15 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
               </div>
 
               {/* Widget Areas */}
-              <div className="space-y-3 pt-4 border-t border-white/[0.08]">
+              <div className="space-y-3 pt-4 border-t border-line">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-white text-xs uppercase tracking-wider">Widget Sidebars</h3>
-                    <p className="text-[11px] text-zinc-400">Registered with register_sidebar() in functions.php</p>
+                    <h3 className="font-semibold text-ink text-xs uppercase tracking-wider">Widget Sidebars</h3>
+                    <p className="text-[11px] text-muted">Registered with register_sidebar() in functions.php</p>
                   </div>
                   <button
                     onClick={handleAddWidgetArea}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg text-xs font-semibold transition-colors border border-white/10"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-inset hover:bg-line text-ink-2 rounded-lg text-xs font-semibold transition-colors border border-line"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add Sidebar</span>
@@ -707,15 +711,15 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
                   {options.widgetAreas.map((w) => (
                     <div
                       key={w.id}
-                      className="p-3 bg-[#08090d] border border-white/[0.08] rounded-xl flex items-center justify-between"
+                      className="p-3 bg-inset border border-line rounded-xl flex items-center justify-between"
                     >
                       <div>
-                        <div className="font-medium text-zinc-200 text-xs">{w.name}</div>
-                        <div className="text-[10px] text-zinc-400">{w.description}</div>
+                        <div className="font-medium text-ink-2 text-xs">{w.name}</div>
+                        <div className="text-[10px] text-muted">{w.description}</div>
                       </div>
                       <button
                         onClick={() => handleRemoveWidgetArea(w.id)}
-                        className="text-zinc-500 hover:text-rose-400 p-1"
+                        className="text-faint hover:text-rose-700 p-1"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -730,52 +734,52 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
           {activeTab === 'general' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-zinc-300">Theme Name</label>
+                <label className="text-xs font-medium text-ink-2">Theme Name</label>
                 <input
                   type="text"
                   value={meta.name}
                   onChange={(e) => setMeta({ ...meta, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-[#08090d] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400"
+                  className="w-full px-3 py-2 bg-inset border border-line rounded-xl text-xs text-ink focus:outline-none focus:border-accent"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-zinc-300">Text Domain</label>
+                <label className="text-xs font-medium text-ink-2">Text Domain</label>
                 <input
                   type="text"
                   value={meta.textDomain}
                   onChange={(e) => setMeta({ ...meta, textDomain: e.target.value })}
-                  className="w-full px-3 py-2 bg-[#08090d] border border-white/[0.08] rounded-xl text-xs text-amber-300 font-mono focus:outline-none focus:border-amber-400"
+                  className="w-full px-3 py-2 bg-inset border border-line rounded-xl text-xs text-accent-ink font-mono focus:outline-none focus:border-accent"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-zinc-300">Author</label>
+                <label className="text-xs font-medium text-ink-2">Author</label>
                 <input
                   type="text"
                   value={meta.author}
                   onChange={(e) => setMeta({ ...meta, author: e.target.value })}
-                  className="w-full px-3 py-2 bg-[#08090d] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400"
+                  className="w-full px-3 py-2 bg-inset border border-line rounded-xl text-xs text-ink focus:outline-none focus:border-accent"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-zinc-300">Version</label>
+                <label className="text-xs font-medium text-ink-2">Version</label>
                 <input
                   type="text"
                   value={meta.version}
                   onChange={(e) => setMeta({ ...meta, version: e.target.value })}
-                  className="w-full px-3 py-2 bg-[#08090d] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400"
+                  className="w-full px-3 py-2 bg-inset border border-line rounded-xl text-xs text-ink focus:outline-none focus:border-accent"
                 />
               </div>
 
               <div className="space-y-1.5 md:col-span-2">
-                <label className="text-xs font-medium text-zinc-300">Description</label>
+                <label className="text-xs font-medium text-ink-2">Description</label>
                 <textarea
                   rows={2}
                   value={meta.description}
                   onChange={(e) => setMeta({ ...meta, description: e.target.value })}
-                  className="w-full px-3 py-2 bg-[#08090d] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400 resize-none"
+                  className="w-full px-3 py-2 bg-inset border border-line rounded-xl text-xs text-ink focus:outline-none focus:border-accent resize-none"
                 />
               </div>
             </div>
@@ -784,10 +788,10 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-4 border-t border-white/[0.08] bg-[#0b0d14] flex items-center justify-between">
+        <div className="px-6 py-4 border-t border-line bg-island flex items-center justify-between">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium text-zinc-400 hover:text-zinc-200"
+            className="px-4 py-2 text-xs font-medium text-muted hover:text-ink-2"
           >
             Close
           </button>
@@ -796,7 +800,7 @@ export const ThemeConfiguratorModal: React.FC<ThemeConfiguratorModalProps> = ({
               onSaveAndConvert();
               onClose();
             }}
-            className="flex items-center gap-1.5 px-5 py-2 text-xs font-bold text-black bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:brightness-110 rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-5 py-2 text-xs font-bold text-white bg-gradient-to-r from-accent via-accent to-accent hover:brightness-110 rounded-xl shadow-lg shadow-accent/20 transition-all active:scale-95"
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>Apply &amp; Rebuild WordPress Theme</span>

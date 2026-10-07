@@ -14,7 +14,7 @@ import {
   Download
 } from 'lucide-react';
 import { WordPressThemeFile } from '../types';
-import { EditorFontSize } from './WorkspaceControls';
+import { EditorFontSize } from '../types';
 
 interface ThemeFilesExplorerProps {
   files: WordPressThemeFile[];
@@ -104,36 +104,36 @@ export const ThemeFilesExplorer: React.FC<ThemeFilesExplorerProps> = ({
   const getFileBadgeColor = (lang: string) => {
     switch (lang) {
       case 'php':
-        return 'text-amber-300 bg-amber-500/10 border-amber-500/30';
+        return 'text-accent-ink bg-accent/10 border-accent/30';
       case 'css':
-        return 'text-sky-300 bg-sky-500/10 border-sky-500/30';
+        return 'text-sky-700 bg-sky-500/10 border-sky-500/30';
       case 'javascript':
-        return 'text-amber-400 bg-amber-400/10 border-amber-400/30';
+        return 'text-accent-ink bg-accent/10 border-accent/30';
       case 'json':
-        return 'text-emerald-300 bg-emerald-500/10 border-emerald-500/30';
+        return 'text-emerald-700 bg-emerald-500/10 border-emerald-500/30';
       case 'xml':
-        return 'text-rose-300 bg-rose-500/10 border-rose-500/30';
+        return 'text-rose-700 bg-rose-500/10 border-rose-500/30';
       case 'pot':
-        return 'text-cyan-300 bg-cyan-500/10 border-cyan-500/30';
+        return 'text-cyan-700 bg-cyan-500/10 border-cyan-500/30';
       default:
-        return 'text-zinc-300 bg-zinc-800/80 border-white/10';
+        return 'text-ink-2 bg-inset border-line';
     }
   };
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row h-full bg-[#08090d] text-zinc-100 overflow-hidden">
+    <div className="flex-1 flex flex-col md:flex-row h-full bg-inset text-ink overflow-hidden">
       {/* File Tree Explorer Column */}
-      <div className="w-full md:w-64 bg-[#0b0d14] border-r border-white/[0.06] flex flex-col shrink-0">
+      <div className="w-full md:w-64 bg-island border-r border-line flex flex-col shrink-0">
         {/* Search & Filter Header */}
-        <div className="p-2.5 border-b border-white/[0.06] space-y-2">
+        <div className="p-2.5 border-b border-line space-y-2">
           <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-zinc-500" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-faint" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search WP files..."
-              className="w-full bg-[#08090d] border border-white/[0.08] rounded-xl pl-8 pr-3 py-1.5 text-xs text-zinc-200 outline-none focus:border-amber-500/50 transition-colors shadow-inner"
+              className="w-full bg-inset border border-line rounded-xl pl-8 pr-3 py-1.5 text-xs text-ink-2 outline-none focus:border-accent/50 transition-colors shadow-inner"
             />
           </div>
 
@@ -143,8 +143,8 @@ export const ThemeFilesExplorer: React.FC<ThemeFilesExplorerProps> = ({
               onClick={() => setFileFilter('all')}
               className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold transition-all whitespace-nowrap ${
                 fileFilter === 'all'
-                  ? 'bg-amber-400 text-black font-bold'
-                  : 'text-zinc-400 hover:text-white bg-white/[0.04]'
+                  ? 'bg-accent text-white font-bold'
+                  : 'text-muted hover:text-ink bg-ink/[0.04]'
               }`}
             >
               All ({files.length})
@@ -153,8 +153,8 @@ export const ThemeFilesExplorer: React.FC<ThemeFilesExplorerProps> = ({
               onClick={() => setFileFilter('php')}
               className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold transition-all whitespace-nowrap ${
                 fileFilter === 'php'
-                  ? 'bg-amber-400 text-black font-bold'
-                  : 'text-zinc-400 hover:text-white bg-white/[0.04]'
+                  ? 'bg-accent text-white font-bold'
+                  : 'text-muted hover:text-ink bg-ink/[0.04]'
               }`}
             >
               PHP
@@ -163,8 +163,8 @@ export const ThemeFilesExplorer: React.FC<ThemeFilesExplorerProps> = ({
               onClick={() => setFileFilter('parts')}
               className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold transition-all whitespace-nowrap ${
                 fileFilter === 'parts'
-                  ? 'bg-amber-400 text-black font-bold'
-                  : 'text-zinc-400 hover:text-white bg-white/[0.04]'
+                  ? 'bg-accent text-white font-bold'
+                  : 'text-muted hover:text-ink bg-ink/[0.04]'
               }`}
             >
               Parts
@@ -173,8 +173,8 @@ export const ThemeFilesExplorer: React.FC<ThemeFilesExplorerProps> = ({
               onClick={() => setFileFilter('css')}
               className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold transition-all whitespace-nowrap ${
                 fileFilter === 'css'
-                  ? 'bg-amber-400 text-black font-bold'
-                  : 'text-zinc-400 hover:text-white bg-white/[0.04]'
+                  ? 'bg-accent text-white font-bold'
+                  : 'text-muted hover:text-ink bg-ink/[0.04]'
               }`}
             >
               CSS
@@ -186,11 +186,11 @@ export const ThemeFilesExplorer: React.FC<ThemeFilesExplorerProps> = ({
         <div className="flex-1 overflow-y-auto p-2 space-y-3">
           {(Object.entries(folderGroups) as [string, WordPressThemeFile[]][]).map(([folderName, folderFileList]) => (
             <div key={folderName}>
-              <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider px-2 py-1 flex items-center gap-1.5">
+              <div className="text-[10px] font-bold text-muted uppercase tracking-wider px-2 py-1 flex items-center gap-1.5">
                 {folderName === 'Theme Root' ? (
-                  <FolderOpen className="w-3.5 h-3.5 text-amber-400" />
+                  <FolderOpen className="w-3.5 h-3.5 text-accent-ink" />
                 ) : (
-                  <Folder className="w-3.5 h-3.5 text-amber-500/80" />
+                  <Folder className="w-3.5 h-3.5 text-accent-ink/80" />
                 )}
                 <span>{folderName} ({folderFileList.length})</span>
               </div>
@@ -201,12 +201,12 @@ export const ThemeFilesExplorer: React.FC<ThemeFilesExplorerProps> = ({
                     onClick={() => handleSelectFile(file.path)}
                     className={`w-full text-left px-2.5 py-1.5 rounded-xl text-xs flex items-center justify-between transition-all duration-150 ${
                       file.path === selectedFilePath
-                        ? 'bg-amber-500/10 text-amber-300 font-semibold border border-amber-500/30 shadow-sm'
-                        : 'text-zinc-300 hover:bg-white/[0.04] hover:text-white border border-transparent'
+                        ? 'bg-accent/10 text-accent-ink font-semibold border border-accent/30 shadow-sm'
+                        : 'text-ink-2 hover:bg-ink/[0.04] hover:text-ink border border-transparent'
                     }`}
                   >
                     <div className="flex items-center gap-2 truncate">
-                      <FileCode className={`w-3.5 h-3.5 shrink-0 ${file.language === 'php' ? 'text-amber-400' : 'text-zinc-400'}`} />
+                      <FileCode className={`w-3.5 h-3.5 shrink-0 ${file.language === 'php' ? 'text-accent-ink' : 'text-muted'}`} />
                       <span className="truncate">{file.name}</span>
                     </div>
                     <span className={`text-[9px] px-1.5 py-0.2 rounded-md uppercase border font-mono ${getFileBadgeColor(file.language)}`}>
@@ -221,22 +221,22 @@ export const ThemeFilesExplorer: React.FC<ThemeFilesExplorerProps> = ({
       </div>
 
       {/* File Viewer / Editor Area */}
-      <div className="flex-1 flex flex-col bg-[#07080c] min-w-0">
+      <div className="flex-1 flex flex-col bg-inset min-w-0">
         {/* File Header Bar */}
-        <div className="bg-[#0c0e15] border-b border-white/[0.06] px-4 py-2 flex items-center justify-between flex-wrap gap-2">
+        <div className="bg-island border-b border-line px-4 py-2 flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 font-mono text-xs font-semibold text-zinc-100">
+            <div className="flex items-center gap-2 font-mono text-xs font-semibold text-ink">
               <span className="w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-emerald-400/20"></span>
               <span>{activeFile?.path}</span>
             </div>
-            <span className="text-zinc-300 text-xs hidden sm:inline font-medium">&bull; {activeFile?.purpose}</span>
+            <span className="text-ink-2 text-xs hidden sm:inline font-medium">&bull; {activeFile?.purpose}</span>
           </div>
 
           <div className="flex items-center gap-2">
-            {isEditing ? (
+            {activeFile?.encoding === 'dataurl' ? null : isEditing ? (
               <button
                 onClick={handleSaveEdit}
-                className="flex items-center gap-1 px-3 py-1 bg-amber-400 hover:bg-amber-300 text-black rounded-lg text-xs font-bold shadow-md shadow-amber-500/20 transition-all"
+                className="flex items-center gap-1 px-3 py-1 bg-accent hover:bg-accent text-white rounded-lg text-xs font-bold shadow-md shadow-accent/20 transition-all"
               >
                 <Save className="w-3.5 h-3.5" />
                 <span>Save Changes</span>
@@ -244,19 +244,19 @@ export const ThemeFilesExplorer: React.FC<ThemeFilesExplorerProps> = ({
             ) : (
               <button
                 onClick={handleStartEdit}
-                className="flex items-center gap-1.5 px-3 py-1 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 rounded-lg text-xs transition-all border border-white/10 font-medium"
+                className="flex items-center gap-1.5 px-3 py-1 bg-inset hover:bg-line text-ink-2 rounded-lg text-xs transition-all border border-line font-medium"
                 title="Edit this WordPress file"
               >
-                <Edit3 className="w-3.5 h-3.5 text-amber-400" />
+                <Edit3 className="w-3.5 h-3.5 text-accent-ink" />
                 <span>Edit File</span>
               </button>
             )}
 
             <button
               onClick={handleCopyCode}
-              className="flex items-center gap-1.5 px-3 py-1 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 rounded-lg text-xs transition-all border border-white/10 font-medium"
+              className="flex items-center gap-1.5 px-3 py-1 bg-inset hover:bg-line text-ink-2 rounded-lg text-xs transition-all border border-line font-medium"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied' : 'Copy'}</span>
             </button>
           </div>
@@ -264,15 +264,23 @@ export const ThemeFilesExplorer: React.FC<ThemeFilesExplorerProps> = ({
 
         {/* Code Content Container */}
         <div className="flex-1 p-2.5 flex flex-col overflow-hidden">
-          {isEditing ? (
+          {activeFile?.encoding === 'dataurl' ? (
+            <div className="w-full flex-1 bg-inset border border-line rounded-2xl flex items-center justify-center p-4">
+              {activeFile.content.startsWith('data:image/') ? (
+                <img src={activeFile.content} alt={activeFile.path} className="max-w-full max-h-full object-contain" />
+              ) : (
+                <span className="text-xs text-muted">Binary asset &middot; included in the ZIP export</span>
+              )}
+            </div>
+          ) : isEditing ? (
             <textarea
               value={editedContent}
               onChange={(e) => setEditedContent(e.target.value)}
-              className={`w-full flex-1 bg-[#090b11] text-zinc-100 font-mono p-4 rounded-2xl border border-white/[0.08] focus:border-amber-500/50 outline-none resize-none selection:bg-amber-500/30 transition-colors shadow-inner ${getFontSizeClass()}`}
+              className={`w-full flex-1 bg-inset text-ink font-mono p-4 rounded-2xl border border-line focus:border-accent/50 outline-none resize-none selection:bg-accent/30 transition-colors shadow-inner ${getFontSizeClass()}`}
               spellCheck={false}
             />
           ) : (
-            <div className="w-full flex-1 bg-[#090b11] border border-white/[0.08] rounded-2xl overflow-auto p-4 font-mono text-zinc-100 selection:bg-amber-500/30 shadow-inner">
+            <div className="w-full flex-1 bg-inset border border-line rounded-2xl overflow-auto p-4 font-mono text-ink selection:bg-accent/30 shadow-inner">
               <pre className={`whitespace-pre ${getFontSizeClass()}`}>
                 <code>{activeFile?.content}</code>
               </pre>

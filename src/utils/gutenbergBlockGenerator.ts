@@ -1,5 +1,5 @@
 import { GutenbergBlockDefinition, WordPressThemeFile, WordPressThemeMeta } from '../types';
-import { sanitizeSlug } from './converter';
+import { sanitizeSlug, toPhpPrefix, phpStr } from './converter/php';
 
 /**
  * Generates Gutenberg custom blocks (block.json + render.php) and registration code
@@ -8,7 +8,9 @@ export function generateGutenbergBlockFiles(
   meta: WordPressThemeMeta,
   blocks?: GutenbergBlockDefinition[]
 ): WordPressThemeFile[] {
-  const prefix = sanitizeSlug(meta.textDomain || meta.name);
+  const prefix = toPhpPrefix(meta.textDomain || meta.name);
+  // Block names only allow lowercase letters, digits and hyphens in the namespace
+  const blockNamespace = sanitizeSlug(meta.textDomain || meta.name);
   const files: WordPressThemeFile[] = [];
 
   const defaultBlocks: GutenbergBlockDefinition[] = blocks && blocks.length > 0 ? blocks : [
@@ -55,7 +57,7 @@ function ${prefix}_register_block_category($categories) {
         array(
             array(
                 'slug'  => 'theme-blocks',
-                'title' => esc_html__('${meta.name} Custom Blocks', '${meta.textDomain}'),
+                'title' => esc_html__('${phpStr(meta.name)} Custom Blocks', '${meta.textDomain}'),
                 'icon'  => 'superhero',
             ),
         )
@@ -66,9 +68,6 @@ add_filter('block_categories_all', '${prefix}_register_block_category', 10, 1);
 /**
  * Register Native WordPress 6.x Blocks from block.json
  */
-function ${prefix}_register_theme_blocks() {
-${registerCalls}
-}
 add_action('init', '${prefix}_theme_blocks_init');
 function ${prefix}_theme_blocks_init() {
 ${registerCalls}
@@ -89,7 +88,7 @@ ${registerCalls}
   const heroBlockJson = {
     $schema: 'https://schemas.wp.org/trunk/block.json',
     apiVersion: 3,
-    name: `${prefix}/hero-banner`,
+    name: `${blockNamespace}/hero-banner`,
     version: '1.0.0',
     title: `${meta.name} Hero Banner`,
     category: 'theme-blocks',
@@ -191,7 +190,7 @@ $wrapper_attributes = get_block_wrapper_attributes(array(
   const featureBlockJson = {
     $schema: 'https://schemas.wp.org/trunk/block.json',
     apiVersion: 3,
-    name: `${prefix}/feature-grid`,
+    name: `${blockNamespace}/feature-grid`,
     version: '1.0.0',
     title: `${meta.name} Feature Cards`,
     category: 'theme-blocks',

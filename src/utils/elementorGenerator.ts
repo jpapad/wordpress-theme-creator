@@ -1,53 +1,227 @@
 import { ElementorWidgetDefinition, WordPressThemeFile, WordPressThemeMeta } from '../types';
-import { sanitizeSlug } from './converter';
+import { commentSafe, phpStr, sanitizeSlug, toPhpPrefix } from './converter/php';
+import { EditableField, EditableSection, renderElementor } from './converter/editable';
+import { phpValue, raw } from './converter/acfFields';
+
+const pascal = (slug: string) =>
+  slug
+    .split(/[_-]+/)
+    .filter(Boolean)
+    .map((p) => p[0].toUpperCase() + p.slice(1))
+    .join('_');
+
+interface WidgetFile {
+  className: string;
+  path: string;
+  content: string;
+}
+
+/** Elementor control for an editable field. Dynamic tags let Elementor Pro bind it to ACF. */
+function controlFor(field: EditableField, td: string): string {
+  const common = {
+    label: raw(`esc_html__('${phpStr(field.label)}', '${td}')`),
+    dynamic: { active: true },
+  };
+  let control: Record<string, unknown>;
+  switch (field.type) {
+    case 'text':
+      control = { ...common, type: raw('Controls_Manager::TEXT'), default: field.defaultText, label_block: true };
+      break;
+    case 'html':
+      control = { ...common, type: raw('Controls_Manager::TEXTAREA'), default: field.defaultText, rows: 4 };
+      break;
+    case 'url':
+      control = { ...common, type: raw('Controls_Manager::URL'), default: { url: raw(field.defaultExpr) } };
+      break;
+    case 'image':
+      control = { ...common, type: raw('Controls_Manager::MEDIA'), default: { url: raw(field.defaultExpr) } };
+      break;
+  }
+  return `        $this->add_control('${field.name}', ${phpValue(control, '        ')});`;
+}
+
+function sectionWidget(section: EditableSection, meta: WordPressThemeMeta, prefix: string): WidgetFile {
+  const td = phpStr(meta.textDomain);
+  const className = `${prefix}_Section_${pascal(section.slug)}_Widget`;
+  const fileSlug = sanitizeSlug(section.slug);
+  const content = `<?php
+/**
+ * Elementor widget for the "${commentSafe(section.title)}" section of ${commentSafe(section.page)}.
+ * Renders the original markup; every text, button and image is a control.
+ *
+ * @package ${commentSafe(meta.name)}
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+use Elementor\\Widget_Base;
+use Elementor\\Controls_Manager;
+
+class ${className} extends Widget_Base {
+
+    public function get_name() {
+        return '${prefix}_${section.slug}';
+    }
+
+    public function get_title() {
+        return esc_html__('${phpStr(section.title)}', '${td}');
+    }
+
+    public function get_icon() {
+        return 'eicon-section';
+    }
+
+    public function get_categories() {
+        return array('${prefix}-elements');
+    }
+
+    public function get_keywords() {
+        return array('${phpStr(section.slug.replace(/_/g, ' '))}', 'section', '${phpStr(meta.textDomain)}');
+    }
+
+    protected function register_controls() {
+        $this->start_controls_section('content_section', array(
+            'label' => esc_html__('Content', '${td}'),
+            'tab'   => Controls_Manager::TAB_CONTENT,
+        ));
+
+${section.fields.map((f) => controlFor(f, td)).join('\n\n')}
+
+        $this->end_controls_section();
+    }
+
+    protected function render() {
+        $s = $this->get_settings_for_display();
+        ?>
+${renderElementor(section)}
+        <?php
+    }
+}
+`;
+  return { className, path: `inc/elementor-widgets/class-section-${fileSlug}.php`, content };
+}
+
+const CUSTOM_CONTROL: Record<string, string> = {
+  TEXT: 'TEXT',
+  TEXTAREA: 'TEXTAREA',
+  WYSIWYG: 'WYSIWYG',
+  MEDIA: 'MEDIA',
+  URL: 'URL',
+  SWITCHER: 'SWITCHER',
+  SELECT: 'TEXT',
+  COLOR: 'COLOR',
+};
+
+/** Widget defined by hand in Theme Settings › Elementor */
+function customWidget(def: ElementorWidgetDefinition, meta: WordPressThemeMeta, prefix: string): WidgetFile {
+  const td = phpStr(meta.textDomain);
+  const slug = sanitizeSlug(def.name || def.title).replace(/-/g, '_') || 'custom';
+  const className = `${prefix}_Custom_${pascal(slug)}_Widget`;
+  const fields = def.fields.map((f) => ({ ...f, name: sanitizeSlug(f.name).replace(/-/g, '_') || 'field' }));
+  const controls = fields
+    .map((f) => {
+      const type = CUSTOM_CONTROL[f.type] || 'TEXT';
+      const defaultValue =
+        type === 'MEDIA' || type === 'URL' ? { url: f.default || '' } : type === 'SWITCHER' ? (f.default ? 'yes' : '') : f.default || '';
+      return `        $this->add_control('${f.name}', ${phpValue(
+        { label: raw(`esc_html__('${phpStr(f.label)}', '${td}')`), type: raw(`Controls_Manager::${type}`), default: defaultValue, dynamic: { active: true } },
+        '        '
+      )});`;
+    })
+    .join('\n\n');
+  const renderRows = fields
+    .map((f) => {
+      const type = CUSTOM_CONTROL[f.type] || 'TEXT';
+      if (type === 'MEDIA') return `            <?php if (!empty($s['${f.name}']['url'])) : ?><img src="<?php echo esc_url($s['${f.name}']['url']); ?>" alt=""><?php endif; ?>`;
+      if (type === 'URL') return `            <?php if (!empty($s['${f.name}']['url'])) : ?><a href="<?php echo esc_url($s['${f.name}']['url']); ?>"><?php echo esc_html($s['${f.name}']['url']); ?></a><?php endif; ?>`;
+      if (type === 'WYSIWYG') return `            <div class="widget-field-${f.name}"><?php echo wp_kses_post($s['${f.name}']); ?></div>`;
+      if (type === 'SWITCHER' || type === 'COLOR') return '';
+      return `            <div class="widget-field-${f.name}"><?php echo esc_html($s['${f.name}']); ?></div>`;
+    })
+    .filter(Boolean)
+    .join('\n');
+
+  const content = `<?php
+/**
+ * Custom Elementor widget "${commentSafe(def.title)}" (defined in Theme Settings).
+ *
+ * @package ${commentSafe(meta.name)}
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+use Elementor\\Widget_Base;
+use Elementor\\Controls_Manager;
+
+class ${className} extends Widget_Base {
+
+    public function get_name() {
+        return '${prefix}_custom_${slug}';
+    }
+
+    public function get_title() {
+        return esc_html__('${phpStr(def.title)}', '${td}');
+    }
+
+    public function get_icon() {
+        return '${phpStr(def.icon || 'eicon-code')}';
+    }
+
+    public function get_categories() {
+        return array('${prefix}-elements');
+    }
+
+    protected function register_controls() {
+        $this->start_controls_section('content_section', array(
+            'label' => esc_html__('Content', '${td}'),
+            'tab'   => Controls_Manager::TAB_CONTENT,
+        ));
+
+${controls}
+
+        $this->end_controls_section();
+    }
+
+    protected function render() {
+        $s = $this->get_settings_for_display();
+        ?>
+        <div class="${prefix}-custom-widget ${prefix}-custom-widget--${slug}">
+${renderRows}
+        </div>
+        <?php
+    }
+}
+`;
+  return { className, path: `inc/elementor-widgets/class-custom-${sanitizeSlug(slug)}.php`, content };
+}
 
 /**
- * Generates full Elementor integration files including Theme Builder Locations,
- * Canvas & Fullwidth Templates, and custom Elementor Widget PHP classes.
+ * Elementor integration: Theme Builder locations, page templates, and widgets generated from
+ * the converted sections (plus custom widgets defined in Theme Settings).
  */
 export function generateElementorIntegrationFiles(
   meta: WordPressThemeMeta,
-  widgets?: ElementorWidgetDefinition[]
+  sections: EditableSection[] = [],
+  customWidgets: ElementorWidgetDefinition[] = []
 ): WordPressThemeFile[] {
-  const prefix = sanitizeSlug(meta.textDomain || meta.name);
+  const prefix = toPhpPrefix(meta.textDomain || meta.name);
+  const td = phpStr(meta.textDomain);
   const files: WordPressThemeFile[] = [];
 
-  const defaultWidgets: ElementorWidgetDefinition[] = widgets && widgets.length > 0 ? widgets : [
-    {
-      id: 'widget-hero',
-      name: 'theme_hero_section',
-      title: `${meta.name} Hero Section`,
-      icon: 'eicon-banner',
-      category: `${prefix}-elements`,
-      fields: [
-        { name: 'heading', label: 'Main Headline', type: 'TEXT', default: 'Build High-Impact Digital Experiences' },
-        { name: 'subheading', label: 'Subheading', type: 'TEXTAREA', default: 'Transform your web presence with our bespoke design system and high-performance framework.' },
-        { name: 'button_text', label: 'Button Text', type: 'TEXT', default: 'Get Started Today' },
-        { name: 'button_url', label: 'Button Link', type: 'URL', default: '#' },
-      ],
-    },
-    {
-      id: 'widget-features',
-      name: 'theme_features_grid',
-      title: `${meta.name} Feature Cards`,
-      icon: 'eicon-posts-grid',
-      category: `${prefix}-elements`,
-      fields: [
-        { name: 'section_title', label: 'Section Title', type: 'TEXT', default: 'Our Core Capabilities' },
-        { name: 'feature_1_title', label: 'Feature 1 Title', type: 'TEXT', default: 'Rapid Performance' },
-        { name: 'feature_1_desc', label: 'Feature 1 Description', type: 'TEXTAREA', default: 'Engineered for sub-second load times and flawless Google Core Web Vitals.' },
-        { name: 'feature_2_title', label: 'Feature 2 Title', type: 'TEXT', default: 'Dynamic Templating' },
-        { name: 'feature_2_desc', label: 'Feature 2 Description', type: 'TEXTAREA', default: 'Fully compatible with Elementor Theme Builder and standard WP hooks.' },
-      ],
-    },
+  const widgets = [
+    ...sections.map((s) => sectionWidget(s, meta, prefix)),
+    ...customWidgets.filter((w) => w.fields?.length).map((w) => customWidget(w, meta, prefix)),
   ];
 
-  // 1. Elementor Theme Support & Locations Handler (inc/elementor-support.php)
   const elementorSupportPhp = `<?php
 /**
  * Elementor Compatibility & Theme Builder Support
  *
- * @package ${meta.name}
+ * @package ${commentSafe(meta.name)}
  */
 
 if (!defined('ABSPATH')) {
@@ -65,31 +239,33 @@ function ${prefix}_register_elementor_locations($elementor_theme_manager) {
 add_action('elementor/theme/register_locations', '${prefix}_register_elementor_locations');
 
 /**
- * Register Elementor Widget Category
+ * Widget category holding the theme's section widgets
  */
 function ${prefix}_add_elementor_widget_categories($elements_manager) {
     $elements_manager->add_category(
         '${prefix}-elements',
         array(
-            'title' => esc_html__('${meta.name} Widgets', '${meta.textDomain}'),
+            'title' => esc_html__('${phpStr(meta.name)} Sections', '${td}'),
             'icon'  => 'fa fa-plug',
         )
     );
 }
 add_action('elementor/elements/categories_registered', '${prefix}_add_elementor_widget_categories');
-
+${
+  widgets.length
+    ? `
 /**
- * Register Custom Theme Elementor Widgets
+ * Register the theme's Elementor widgets (one per converted section)
  */
 function ${prefix}_register_custom_elementor_widgets($widgets_manager) {
-    require_once get_template_directory() . '/inc/elementor-widgets/class-elementor-hero-widget.php';
-    require_once get_template_directory() . '/inc/elementor-widgets/class-elementor-features-widget.php';
+${widgets.map((w) => `    require_once get_template_directory() . '/${w.path}';`).join('\n')}
 
-    $widgets_manager->register(new \\${prefix}_Elementor_Hero_Widget());
-    $widgets_manager->register(new \\${prefix}_Elementor_Features_Widget());
+${widgets.map((w) => `    $widgets_manager->register(new \\${w.className}());`).join('\n')}
 }
 add_action('elementor/widgets/register', '${prefix}_register_custom_elementor_widgets');
-
+`
+    : ''
+}
 /**
  * Helper to check if Elementor Theme Location is active
  */
@@ -99,6 +275,22 @@ function ${prefix}_is_elementor_location_active($location) {
     }
     return elementor_theme_do_location($location);
 }
+
+/**
+ * True when the current page was built with Elementor: templates then show the Elementor
+ * content instead of the converted static markup.
+ */
+function ${prefix}_is_built_with_elementor() {
+    if (!did_action('elementor/loaded') || !class_exists('\\\\Elementor\\\\Plugin')) {
+        return false;
+    }
+    $post_id = get_queried_object_id();
+    if (!$post_id) {
+        return false;
+    }
+    $document = \\Elementor\\Plugin::$instance->documents->get($post_id);
+    return $document && $document->is_built_with_elementor();
+}
 `;
 
   files.push({
@@ -107,17 +299,20 @@ function ${prefix}_is_elementor_location_active($location) {
     folder: 'inc',
     content: elementorSupportPhp,
     language: 'php',
-    purpose: 'Elementor Theme Builder locations, categories, and widget registration hooks',
+    purpose: `Elementor Theme Builder locations, widget category and ${widgets.length} widget registrations`,
     isCore: false,
   });
 
-  // 2. Elementor Canvas Page Template (template-elementor-canvas.php)
-  const canvasTemplatePhp = `<?php
+  files.push({
+    path: 'page-templates/template-elementor-canvas.php',
+    name: 'template-elementor-canvas.php',
+    folder: 'page-templates',
+    content: `<?php
 /**
  * Template Name: Elementor Canvas (No Header, No Footer)
  * Template Post Type: post, page
  *
- * @package ${meta.name}
+ * @package ${commentSafe(meta.name)}
  */
 
 if (!defined('ABSPATH')) {
@@ -147,31 +342,28 @@ if (!defined('ABSPATH')) {
 <?php wp_footer(); ?>
 </body>
 </html>
-`;
-
-  files.push({
-    path: 'page-templates/template-elementor-canvas.php',
-    name: 'template-elementor-canvas.php',
-    folder: 'page-templates',
-    content: canvasTemplatePhp,
+`,
     language: 'php',
     purpose: 'Blank full-screen Elementor Canvas template for landing pages',
     isCore: false,
   });
 
-  // 3. Elementor Full Width Page Template (template-elementor-fullwidth.php)
-  const fullwidthTemplatePhp = `<?php
+  files.push({
+    path: 'page-templates/template-elementor-fullwidth.php',
+    name: 'template-elementor-fullwidth.php',
+    folder: 'page-templates',
+    content: `<?php
 /**
  * Template Name: Elementor Full Width
  * Template Post Type: post, page
  *
- * @package ${meta.name}
+ * @package ${commentSafe(meta.name)}
  */
 
 get_header();
 ?>
 
-<main id="primary" class="site-main elementor-fullwidth-container w-full overflow-hidden">
+<main id="primary" class="site-main elementor-fullwidth-container">
     <?php
     while (have_posts()) :
         the_post();
@@ -182,298 +374,23 @@ get_header();
 
 <?php
 get_footer();
-`;
-
-  files.push({
-    path: 'page-templates/template-elementor-fullwidth.php',
-    name: 'template-elementor-fullwidth.php',
-    folder: 'page-templates',
-    content: fullwidthTemplatePhp,
+`,
     language: 'php',
     purpose: 'Elementor Full-Width Page Template retaining theme header & footer',
     isCore: false,
   });
 
-  // 4. Custom Elementor Hero Widget Class (inc/elementor-widgets/class-elementor-hero-widget.php)
-  const heroWidgetPhp = `<?php
-/**
- * Custom Elementor Hero Widget
- *
- * @package ${meta.name}
- */
-
-if (!defined('ABSPATH')) {
-    exit;
-}
-
-use Elementor\\Widget_Base;
-use Elementor\\Controls_Manager;
-
-class ${prefix}_Elementor_Hero_Widget extends Widget_Base {
-
-    public function get_name() {
-        return '${prefix}_hero_section';
-    }
-
-    public function get_title() {
-        return esc_html__('${meta.name} Hero Section', '${meta.textDomain}');
-    }
-
-    public function get_icon() {
-        return 'eicon-banner';
-    }
-
-    public function get_categories() {
-        return array('${prefix}-elements');
-    }
-
-    public function get_keywords() {
-        return array('hero', 'banner', 'cta', '${prefix}');
-    }
-
-    protected function register_controls() {
-        // Content Section
-        $this->start_controls_section(
-            'section_content',
-            array(
-                'label' => esc_html__('Hero Content', '${meta.textDomain}'),
-                'tab'   => Controls_Manager::TAB_CONTENT,
-            )
-        );
-
-        $this->add_control(
-            'heading',
-            array(
-                'label'       => esc_html__('Main Headline', '${meta.textDomain}'),
-                'type'        => Controls_Manager::TEXT,
-                'default'     => esc_html__('Build High-Impact Digital Experiences', '${meta.textDomain}'),
-                'placeholder' => esc_html__('Enter headline...', '${meta.textDomain}'),
-                'label_block' => true,
-            )
-        );
-
-        $this->add_control(
-            'subheading',
-            array(
-                'label'       => esc_html__('Subheading Text', '${meta.textDomain}'),
-                'type'        => Controls_Manager::TEXTAREA,
-                'default'     => esc_html__('Transform your web presence with our bespoke design system and high-performance framework.', '${meta.textDomain}'),
-                'rows'        => 3,
-            )
-        );
-
-        $this->add_control(
-            'button_text',
-            array(
-                'label'   => esc_html__('Button Label', '${meta.textDomain}'),
-                'type'    => Controls_Manager::TEXT,
-                'default' => esc_html__('Get Started Today', '${meta.textDomain}'),
-            )
-        );
-
-        $this->add_control(
-            'button_url',
-            array(
-                'label'         => esc_html__('Button Link', '${meta.textDomain}'),
-                'type'          => Controls_Manager::URL,
-                'placeholder'   => 'https://example.com',
-                'show_external' => true,
-                'default'       => array(
-                    'url'         => '#',
-                    'is_external' => false,
-                    'nofollow'    => false,
-                ),
-            )
-        );
-
-        $this->end_controls_section();
-
-        // Style Section
-        $this->start_controls_section(
-            'section_style',
-            array(
-                'label' => esc_html__('Typography & Colors', '${meta.textDomain}'),
-                'tab'   => Controls_Manager::TAB_STYLE,
-            )
-        );
-
-        $this->add_control(
-            'heading_color',
-            array(
-                'label'     => esc_html__('Heading Color', '${meta.textDomain}'),
-                'type'      => Controls_Manager::COLOR,
-                'selectors' => array(
-                    '{{WRAPPER}} .theme-hero-title' => 'color: {{VALUE}};',
-                ),
-            )
-        );
-
-        $this->end_controls_section();
-    }
-
-    protected function render() {
-        $settings = $this->get_settings_for_display();
-        $target   = $settings['button_url']['is_external'] ? ' target="_blank"' : '';
-        $nofollow = $settings['button_url']['nofollow'] ? ' rel="nofollow"' : '';
-        ?>
-        <section class="theme-elementor-hero py-20 px-6 max-w-6xl mx-auto text-center">
-            <?php if (!empty($settings['heading'])) : ?>
-                <h1 class="theme-hero-title text-4xl sm:text-6xl font-extrabold tracking-tight mb-6">
-                    <?php echo esc_html($settings['heading']); ?>
-                </h1>
-            <?php endif; ?>
-
-            <?php if (!empty($settings['subheading'])) : ?>
-                <p class="theme-hero-subheading text-lg sm:text-xl text-zinc-400 max-w-3xl mx-auto mb-8">
-                    <?php echo esc_html($settings['subheading']); ?>
-                </p>
-            <?php endif; ?>
-
-            <?php if (!empty($settings['button_text'])) : ?>
-                <div class="theme-hero-action">
-                    <a href="<?php echo esc_url($settings['button_url']['url']); ?>"<?php echo $target . $nofollow; ?> class="inline-flex items-center justify-center px-8 py-3.5 rounded-xl font-bold bg-amber-400 text-black hover:bg-amber-300 transition-all shadow-lg shadow-amber-500/20">
-                        <?php echo esc_html($settings['button_text']); ?> &rarr;
-                    </a>
-                </div>
-            <?php endif; ?>
-        </section>
-        <?php
-    }
-}
-`;
-
-  files.push({
-    path: 'inc/elementor-widgets/class-elementor-hero-widget.php',
-    name: 'class-elementor-hero-widget.php',
-    folder: 'inc/elementor-widgets',
-    content: heroWidgetPhp,
-    language: 'php',
-    purpose: 'Native Elementor custom Hero widget class with controls and live rendering',
-    isCore: false,
-  });
-
-  // 5. Custom Elementor Features Widget Class (inc/elementor-widgets/class-elementor-features-widget.php)
-  const featuresWidgetPhp = `<?php
-/**
- * Custom Elementor Features Grid Widget
- *
- * @package ${meta.name}
- */
-
-if (!defined('ABSPATH')) {
-    exit;
-}
-
-use Elementor\\Widget_Base;
-use Elementor\\Controls_Manager;
-
-class ${prefix}_Elementor_Features_Widget extends Widget_Base {
-
-    public function get_name() {
-        return '${prefix}_features_grid';
-    }
-
-    public function get_title() {
-        return esc_html__('${meta.name} Features Grid', '${meta.textDomain}');
-    }
-
-    public function get_icon() {
-        return 'eicon-posts-grid';
-    }
-
-    public function get_categories() {
-        return array('${prefix}-elements');
-    }
-
-    protected function register_controls() {
-        $this->start_controls_section(
-            'section_content',
-            array(
-                'label' => esc_html__('Features Content', '${meta.textDomain}'),
-                'tab'   => Controls_Manager::TAB_CONTENT,
-            )
-        );
-
-        $this->add_control(
-            'section_title',
-            array(
-                'label'   => esc_html__('Section Header', '${meta.textDomain}'),
-                'type'    => Controls_Manager::TEXT,
-                'default' => esc_html__('Our Key Capabilities', '${meta.textDomain}'),
-            )
-        );
-
-        $this->add_control(
-            'feature_1_title',
-            array(
-                'label'   => esc_html__('Card 1 Title', '${meta.textDomain}'),
-                'type'    => Controls_Manager::TEXT,
-                'default' => esc_html__('Lightning Fast Performance', '${meta.textDomain}'),
-            )
-        );
-
-        $this->add_control(
-            'feature_1_desc',
-            array(
-                'label'   => esc_html__('Card 1 Description', '${meta.textDomain}'),
-                'type'    => Controls_Manager::TEXTAREA,
-                'default' => esc_html__('Optimized assets with sub-second page loads and high PageSpeed ratings.', '${meta.textDomain}'),
-            )
-        );
-
-        $this->add_control(
-            'feature_2_title',
-            array(
-                'label'   => esc_html__('Card 2 Title', '${meta.textDomain}'),
-                'type'    => Controls_Manager::TEXT,
-                'default' => esc_html__('Full Site Customizer', '${meta.textDomain}'),
-            )
-        );
-
-        $this->add_control(
-            'feature_2_desc',
-            array(
-                'label'   => esc_html__('Card 2 Description', '${meta.textDomain}'),
-                'type'    => Controls_Manager::TEXTAREA,
-                'default' => esc_html__('Easily manage menus, logos, widgets, and dynamic tags directly inside WordPress.', '${meta.textDomain}'),
-            )
-        );
-
-        $this->end_controls_section();
-    }
-
-    protected function render() {
-        $settings = $this->get_settings_for_display();
-        ?>
-        <div class="theme-elementor-features py-12 max-w-6xl mx-auto px-4">
-            <?php if (!empty($settings['section_title'])) : ?>
-                <h2 class="text-3xl font-bold text-center mb-10 text-white"><?php echo esc_html($settings['section_title']); ?></h2>
-            <?php endif; ?>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="p-6 rounded-2xl bg-zinc-900/80 border border-white/10 shadow-lg">
-                    <h3 class="text-xl font-bold text-amber-400 mb-2"><?php echo esc_html($settings['feature_1_title']); ?></h3>
-                    <p class="text-zinc-400 text-sm leading-relaxed"><?php echo esc_html($settings['feature_1_desc']); ?></p>
-                </div>
-                <div class="p-6 rounded-2xl bg-zinc-900/80 border border-white/10 shadow-lg">
-                    <h3 class="text-xl font-bold text-amber-400 mb-2"><?php echo esc_html($settings['feature_2_title']); ?></h3>
-                    <p class="text-zinc-400 text-sm leading-relaxed"><?php echo esc_html($settings['feature_2_desc']); ?></p>
-                </div>
-            </div>
-        </div>
-        <?php
-    }
-}
-`;
-
-  files.push({
-    path: 'inc/elementor-widgets/class-elementor-features-widget.php',
-    name: 'class-elementor-features-widget.php',
-    folder: 'inc/elementor-widgets',
-    content: featuresWidgetPhp,
-    language: 'php',
-    purpose: 'Native Elementor Features Grid widget class with responsive controls',
-    isCore: false,
-  });
+  for (const w of widgets) {
+    files.push({
+      path: w.path,
+      name: w.path.split('/').pop()!,
+      folder: 'inc/elementor-widgets',
+      content: w.content,
+      language: 'php',
+      purpose: `Elementor widget ${w.className}`,
+      isCore: false,
+    });
+  }
 
   return files;
 }

@@ -1,5 +1,5 @@
 import { SourceFile, WordPressThemeFile, WordPressThemeMeta } from '../types';
-import { sanitizeSlug } from './converter';
+import { sanitizeSlug, toPhpPrefix, phpStr } from './converter/php';
 
 /**
  * Generates WXR XML 1.2 compliant demo content and OCDI configuration files
@@ -8,7 +8,7 @@ export function generateDemoContentFiles(
   meta: WordPressThemeMeta,
   sourceFiles: SourceFile[]
 ): WordPressThemeFile[] {
-  const prefix = sanitizeSlug(meta.textDomain || meta.name);
+  const prefix = toPhpPrefix(meta.textDomain || meta.name);
   const files: WordPressThemeFile[] = [];
 
   const mainHtml = sourceFiles.find((f) => f.type === 'html')?.content || '';
@@ -188,7 +188,7 @@ if (!defined('ABSPATH')) {
 function ${prefix}_ocdi_import_files() {
     return array(
         array(
-            'import_file_name'           => esc_html__('${meta.name} Default Demo', '${meta.textDomain}'),
+            'import_file_name'           => esc_html__('${phpStr(meta.name)} Default Demo', '${meta.textDomain}'),
             'categories'                 => array('Main Demos'),
             'local_import_file'          => trailingslashit(get_template_directory()) . 'demo-data/content.xml',
             'import_preview_image_url'   => trailingslashit(get_template_directory_uri()) . 'screenshot.png',

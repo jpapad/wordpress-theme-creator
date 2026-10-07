@@ -1,232 +1,214 @@
-import React from 'react';
-import { 
-  CheckCircle2, 
-  AlertTriangle, 
-  XCircle, 
-  ShieldCheck, 
-  Code2, 
-  Zap, 
-  Award,
-  Layers,
-  FileCode,
-  Terminal
-} from 'lucide-react';
-import { ConversionResult } from '../types';
+import React, { useState } from 'react';
+import { AlertTriangle, Check, ShieldCheck, X } from 'lucide-react';
+import { ConversionResult, ValidationItem } from '../types';
 
 interface ThemeValidationReportProps {
   result: ConversionResult | null;
 }
 
+const CATEGORIES: { id: 'all' | ValidationItem['category']; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'core', label: 'Core' },
+  { id: 'hooks', label: 'Hooks' },
+  { id: 'standards', label: 'Standards' },
+  { id: 'security', label: 'Security' },
+  { id: 'blocks', label: 'Blocks' },
+  { id: 'woocommerce', label: 'WooCommerce' },
+];
+
+const STATUS_STYLE: Record<ValidationItem['status'], { bg: string; fg: string; Icon: typeof Check }> = {
+  pass: { bg: 'bg-ok-soft', fg: 'text-ok', Icon: Check },
+  warning: { bg: 'bg-warn-soft', fg: 'text-warn', Icon: AlertTriangle },
+  error: { bg: 'bg-err-soft', fg: 'text-err', Icon: X },
+};
+
+/**
+ * Which template WordPress resolves first for common requests, given the generated files.
+ */
+function hierarchyRows(paths: Set<string>) {
+  const pick = (...candidates: string[]) => candidates.filter((c) => paths.has(c));
+  const pageTemplate = [...paths].find((p) => /^page-[^/]+\.php$/.test(p));
+  const rows = [
+    { label: 'Front page', chain: pick('front-page.php', 'home.php', 'index.php') },
+    { label: 'Blog post', chain: pick('single.php', 'singular.php', 'index.php') },
+    { label: 'Archive', chain: pick('archive.php', 'index.php') },
+    { label: 'Not found', chain: pick('404.php', 'index.php') },
+  ];
+  if (pageTemplate) {
+    rows.splice(1, 0, { label: pageTemplate.replace(/^page-|\.php$/g, ''), chain: [pageTemplate, ...pick('page.php', 'index.php')] });
+  }
+  return rows.filter((r) => r.chain.length > 0);
+}
+
 export const ThemeValidationReport: React.FC<ThemeValidationReportProps> = ({ result }) => {
+  const [filter, setFilter] = useState<(typeof CATEGORIES)[number]['id']>('all');
+
   if (!result) {
     return (
-      <div className="flex-1 flex items-center justify-center p-8 bg-[#09090b] text-zinc-400 text-center">
-        <div>
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto mb-3 border border-amber-500/20">
-            <ShieldCheck className="w-6 h-6" />
-          </div>
-          <h3 className="text-base font-semibold text-white mb-1">Theme Audit Ready</h3>
-          <p className="text-xs text-zinc-400 max-w-sm">
-            Convert HTML/CSS to inspect official WordPress.org Theme Check compliance score, security guards, and hook validations.
-          </p>
+      <div className="flex-1 flex items-center justify-center p-8 text-center">
+        <div className="island p-8 max-w-sm">
+          <ShieldCheck className="w-8 h-8 mx-auto mb-3 text-accent-ink" />
+          <h2 className="font-display text-lg font-bold mb-1">Nothing to audit yet</h2>
+          <p className="text-sm text-muted">Convert your HTML to check PHP syntax, hooks, security and standards.</p>
         </div>
       </div>
     );
   }
 
-  const passCount = result.validations.filter((v) => v.status === 'pass').length;
-  const warningCount = result.validations.filter((v) => v.status === 'warning').length;
-  const errorCount = result.validations.filter((v) => v.status === 'error').length;
-  const totalCount = result.validations.length;
-  const score = Math.round((passCount / (totalCount || 1)) * 100);
+  const { validations } = result;
+  const passCount = validations.filter((v) => v.status === 'pass').length;
+  const warnings = validations.filter((v) => v.status === 'warning');
+  const errors = validations.filter((v) => v.status === 'error');
+  const phpFiles = result.files.filter((f) => f.language === 'php').length;
+  const phpErrorItem = validations.find((v) => v.id === 'security-php-syntax' && v.status === 'error');
+  const phpErrorCount = phpErrorItem?.codeSnippet?.split('\n').length ?? 0;
+  const integrity = [
+    { label: 'Duplicate declarations', id: 'core-duplicate-declarations' },
+    { label: 'Missing includes', id: 'core-missing-includes' },
+    { label: 'Invalid JSON', id: 'standards-json' },
+  ].map((row) => {
+    const item = validations.find((v) => v.id === row.id);
+    return { ...row, count: item?.codeSnippet ? item.codeSnippet.split('\n').length : 0 };
+  });
+  const issues = [...errors, ...warnings];
+  const visible = filter === 'all' ? validations : validations.filter((v) => v.category === filter);
+  const categoriesPresent = CATEGORIES.filter((c) => c.id === 'all' || validations.some((v) => v.category === c.id));
+  const rows = hierarchyRows(new Set(result.files.map((f) => f.path)));
+  const headline = errors.length
+    ? `${errors.length} issue${errors.length > 1 ? 's' : ''} to fix before installing.`
+    : 'Ready to install on any WordPress 6.x site.';
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#08090d] text-zinc-100 overflow-y-auto p-4 md:p-6">
-      <div className="max-w-5xl mx-auto w-full space-y-6">
-        {/* Score & Highlights Banner */}
-        <div className="bg-gradient-to-br from-[#10131d] via-[#0d0f17] to-[#08090d] border border-white/[0.08] rounded-3xl p-6 shadow-xl">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-5">
-              {/* Score Circle */}
-              <div className="relative w-24 h-24 rounded-2xl bg-[#08090d] border border-white/[0.08] flex flex-col items-center justify-center shadow-inner">
-                <span className="text-3xl font-black text-emerald-400 font-mono">{score}%</span>
-                <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-bold">WP Score</span>
-              </div>
-
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-white font-display">WordPress Theme Check Audit</h2>
-                  <span className="px-2.5 py-0.5 text-[10px] font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 rounded-full flex items-center gap-1">
-                    <Award className="w-3 h-3" /> Ready for Production
-                  </span>
-                </div>
-                <p className="text-xs text-zinc-400 mt-1">
-                  Evaluated against WordPress Theme Developer Handbook, Theme Check standard guidelines, and modern Gutenberg requirements.
-                </p>
-              </div>
-            </div>
-
-            {/* Quick Metrics */}
-            <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-              <div className="p-3 bg-[#08090d] border border-white/[0.08] rounded-2xl text-center min-w-[90px]">
-                <div className="text-xl font-bold text-emerald-400 font-mono">{passCount}</div>
-                <div className="text-[10px] text-zinc-400 font-bold uppercase">Passed</div>
-              </div>
-              <div className="p-3 bg-[#08090d] border border-white/[0.08] rounded-2xl text-center min-w-[90px]">
-                <div className="text-xl font-bold text-amber-400 font-mono">{warningCount}</div>
-                <div className="text-[10px] text-zinc-400 font-bold uppercase">Warnings</div>
-              </div>
-              <div className="p-3 bg-[#08090d] border border-white/[0.08] rounded-2xl text-center min-w-[90px]">
-                <div className="text-xl font-bold text-rose-400 font-mono">{errorCount}</div>
-                <div className="text-[10px] text-zinc-400 font-bold uppercase">Errors</div>
-              </div>
+    <div className="flex-1 min-h-0 overflow-y-auto">
+      <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]">
+        {/* Score */}
+        <section className="sm:col-span-2 flex flex-wrap items-center gap-7 p-7 rounded-3xl bg-ink text-white">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[13px] text-[#A9AFBC]">Theme health</span>
+            <span className="font-display text-8xl font-bold leading-[0.9] tracking-tighter">{result.stats.themeScore}</span>
+          </div>
+          <div className="flex-[1_1_260px] flex flex-col gap-3.5">
+            <h1 className="font-display text-[28px] font-bold leading-tight">{headline}</h1>
+            <div className="flex flex-wrap gap-2 text-[13px] font-semibold">
+              <span className="px-3 py-1.5 rounded-full bg-[#1F3A2B] text-[#8CE8B4]">{passCount} passed</span>
+              <span className="px-3 py-1.5 rounded-full bg-[#3A3018] text-[#F6CF7A]">
+                {warnings.length} warning{warnings.length === 1 ? '' : 's'}
+              </span>
+              <span className={`px-3 py-1.5 rounded-full ${errors.length ? 'bg-[#4A1D1A] text-[#FFB4AB]' : 'bg-[#262A34] text-[#D7DAE1]'}`}>
+                {errors.length} error{errors.length === 1 ? '' : 's'}
+              </span>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-          <div className="p-4 bg-[#0c0e15] border border-white/[0.06] rounded-2xl">
-            <div className="text-zinc-400 text-xs flex items-center gap-1.5 mb-1 font-semibold">
-              <FileCode className="w-4 h-4 text-amber-400" />
-              <span>Theme Files</span>
-            </div>
-            <div className="text-xl font-bold text-white font-mono">{result.stats.filesCreated} generated</div>
-            <div className="text-[11px] text-zinc-500 mt-0.5">Template hierarchy intact</div>
+        {/* PHP syntax */}
+        <section className="island p-6 flex flex-col gap-3.5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[15px] font-bold">PHP 8 syntax</h2>
+            <span className={`w-7 h-7 rounded-full flex items-center justify-center ${phpErrorItem ? 'bg-err-soft text-err' : 'bg-ok-soft text-ok'}`}>
+              {phpErrorItem ? <X className="w-3.5 h-3.5" strokeWidth={3} /> : <Check className="w-3.5 h-3.5" strokeWidth={3} />}
+            </span>
           </div>
+          <span className="font-display text-[40px] font-bold leading-none">
+            {phpFiles - phpErrorCount} / {phpFiles}
+          </span>
+          <span className="text-muted">files parsed without errors</span>
+        </section>
 
-          <div className="p-4 bg-[#0c0e15] border border-white/[0.06] rounded-2xl">
-            <div className="text-zinc-400 text-xs flex items-center gap-1.5 mb-1 font-semibold">
-              <Zap className="w-4 h-4 text-amber-400" />
-              <span>WordPress Hooks</span>
+        {/* Integrity */}
+        <section className="island p-6 flex flex-col gap-3">
+          <h2 className="text-[15px] font-bold">Integrity</h2>
+          {integrity.map((row) => (
+            <div key={row.id} className="flex items-center justify-between px-3.5 py-3 rounded-[14px] bg-inset">
+              <span>{row.label}</span>
+              <strong className={row.count ? 'text-err' : ''}>{row.count}</strong>
             </div>
-            <div className="text-xl font-bold text-white font-mono">{result.stats.phpHooksInjected} injected</div>
-            <div className="text-[11px] text-zinc-500 mt-0.5">wp_head, wp_footer &amp; body_class</div>
+          ))}
+        </section>
+
+        {/* Template hierarchy */}
+        <section className="island sm:col-span-2 p-6 flex flex-col gap-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="text-[15px] font-bold">Template hierarchy</h2>
+            <span className="text-[13px] text-muted">What WordPress loads for each request</span>
           </div>
-
-          <div className="p-4 bg-[#0c0e15] border border-white/[0.06] rounded-2xl">
-            <div className="text-zinc-400 text-xs flex items-center gap-1.5 mb-1 font-semibold">
-              <Code2 className="w-4 h-4 text-amber-300" />
-              <span>Template Tags</span>
-            </div>
-            <div className="text-xl font-bold text-white font-mono">{result.stats.templateTagsUsed} tags</div>
-            <div className="text-[11px] text-zinc-500 mt-0.5">the_title, the_content, etc.</div>
-          </div>
-
-          <div className="p-4 bg-[#0c0e15] border border-white/[0.06] rounded-2xl">
-            <div className="text-zinc-400 text-xs flex items-center gap-1.5 mb-1 font-semibold">
-              <Layers className="w-4 h-4 text-emerald-400" />
-              <span>Enqueued Assets</span>
-            </div>
-            <div className="text-xl font-bold text-white font-mono">{result.stats.assetsEnqueued} assets</div>
-            <div className="text-[11px] text-zinc-500 mt-0.5">wp_enqueue_scripts verified</div>
-          </div>
-        </div>
-
-        {/* Builder & Engine Integrations Status */}
-        <div className="bg-[#0c0e15] border border-white/[0.06] rounded-3xl p-5 space-y-3">
-          <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-            <Award className="w-4 h-4 text-amber-400" />
-            <span>Theme Integrations &amp; Ecosystem Compatibility</span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-            <div className="p-3 bg-[#08090d] border border-rose-500/20 rounded-xl flex items-center justify-between">
-              <div>
-                <div className="font-bold text-white text-xs">Elementor Pro Ready</div>
-                <div className="text-[10px] text-zinc-400">Locations &amp; Custom Widgets</div>
-              </div>
-              <span className="px-2 py-0.5 bg-rose-500/15 text-rose-300 font-mono text-[10px] rounded-md font-bold">100% READY</span>
-            </div>
-
-            <div className="p-3 bg-[#08090d] border border-indigo-500/20 rounded-xl flex items-center justify-between">
-              <div>
-                <div className="font-bold text-white text-xs">Gutenberg &amp; FSE</div>
-                <div className="text-[10px] text-zinc-400">block.json &amp; theme.json</div>
-              </div>
-              <span className="px-2 py-0.5 bg-indigo-500/15 text-indigo-300 font-mono text-[10px] rounded-md font-bold">SUPPORTED</span>
-            </div>
-
-            <div className="p-3 bg-[#08090d] border border-blue-500/20 rounded-xl flex items-center justify-between">
-              <div>
-                <div className="font-bold text-white text-xs">CPTs &amp; Taxonomies</div>
-                <div className="text-[10px] text-zinc-400">Single &amp; Archive Templates</div>
-              </div>
-              <span className="px-2 py-0.5 bg-blue-500/15 text-blue-300 font-mono text-[10px] rounded-md font-bold">REGISTERED</span>
-            </div>
-
-            <div className="p-3 bg-[#08090d] border border-emerald-500/20 rounded-xl flex items-center justify-between">
-              <div>
-                <div className="font-bold text-white text-xs">ACF Local JSON</div>
-                <div className="text-[10px] text-zinc-400">Auto-sync field groups</div>
-              </div>
-              <span className="px-2 py-0.5 bg-emerald-500/15 text-emerald-300 font-mono text-[10px] rounded-md font-bold">SYNCED</span>
-            </div>
-
-            <div className="p-3 bg-[#08090d] border border-amber-500/20 rounded-xl flex items-center justify-between">
-              <div>
-                <div className="font-bold text-white text-xs">One-Click Demo (WXR)</div>
-                <div className="text-[10px] text-zinc-400">demo-data/content.xml &amp; OCDI</div>
-              </div>
-              <span className="px-2 py-0.5 bg-amber-500/15 text-amber-300 font-mono text-[10px] rounded-md font-bold">BUNDLED</span>
-            </div>
-
-            <div className="p-3 bg-[#08090d] border border-cyan-500/20 rounded-xl flex items-center justify-between">
-              <div>
-                <div className="font-bold text-white text-xs">i18n Localization</div>
-                <div className="text-[10px] text-zinc-400">languages/{result.meta.textDomain || 'theme'}.pot</div>
-              </div>
-              <span className="px-2 py-0.5 bg-cyan-500/15 text-cyan-300 font-mono text-[10px] rounded-md font-bold">TRANSLATABLE</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Detailed Validation Items List */}
-        <div className="bg-[#0c0e15] border border-white/[0.06] rounded-3xl p-6 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2 font-display">
-              <ShieldCheck className="w-4 h-4 text-amber-400" />
-              <span>Theme Compliance &amp; Standards Checks</span>
-            </h3>
-            <span className="text-xs text-zinc-400 font-mono">{result.validations.length} Rules Inspected</span>
-          </div>
-
-          <div className="space-y-3">
-            {result.validations.map((item) => (
-              <div
-                key={item.id}
-                className="p-3.5 bg-[#08090d] border border-white/[0.06] hover:border-white/[0.12] rounded-2xl flex items-start gap-3.5 transition-colors"
-              >
-                <div className="mt-0.5">
-                  {item.status === 'pass' ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  ) : item.status === 'warning' ? (
-                    <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-                  ) : (
-                    <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
-                  )}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold text-white">{item.title}</span>
-                    <span className="text-[10px] px-1.5 py-0.2 bg-zinc-800 text-zinc-400 rounded uppercase font-semibold">
-                      {item.category}
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-zinc-300 mt-1 leading-relaxed">{item.description}</p>
-
-                  {item.recommendation && (
-                    <div className="mt-2 text-[11px] text-amber-300/90 bg-amber-500/10 p-2 rounded border border-amber-500/20 font-mono">
-                      Fix: {item.recommendation}
-                    </div>
-                  )}
-                </div>
+          <div className="flex flex-col gap-2.5">
+            {rows.map((row) => (
+              <div key={row.label} className="flex flex-wrap items-center gap-2">
+                <span className="w-24 text-[13px] text-muted capitalize truncate">{row.label}</span>
+                {row.chain.map((file, i) => (
+                  <React.Fragment key={file}>
+                    {i > 0 && <span className="text-faint" aria-hidden="true">→</span>}
+                    <span className={`px-3 py-2 rounded-[10px] font-mono text-xs ${i === 0 ? 'bg-accent text-white' : 'bg-inset text-muted'}`}>{file}</span>
+                  </React.Fragment>
+                ))}
               </div>
             ))}
           </div>
-        </div>
+        </section>
+
+        {/* Issues */}
+        <section className={`p-6 flex flex-col gap-3 rounded-[22px] ${issues.length ? (errors.length ? 'bg-err-soft' : 'bg-warn-soft') : 'island'}`}>
+          <div className="flex items-center gap-2">
+            {issues.length ? (
+              <AlertTriangle className={`w-[18px] h-[18px] ${errors.length ? 'text-err' : 'text-warn'}`} />
+            ) : (
+              <ShieldCheck className="w-[18px] h-[18px] text-ok" />
+            )}
+            <h2 className="text-[15px] font-bold">{issues.length ? `${issues.length} to review` : 'No issues'}</h2>
+          </div>
+          {issues.length === 0 && <p className="text-muted leading-relaxed">Every check passed.</p>}
+          {issues.slice(0, 3).map((item) => (
+            <div key={item.id} className="flex flex-col gap-1">
+              <p className="font-semibold leading-snug">{item.title}</p>
+              <p className="text-[13px] text-ink-2 leading-relaxed">{item.description}</p>
+              {item.codeSnippet && (
+                <pre className="mt-1 p-2.5 rounded-lg bg-island/70 text-[11px] font-mono whitespace-pre-wrap break-all max-h-32 overflow-auto">{item.codeSnippet}</pre>
+              )}
+            </div>
+          ))}
+        </section>
+
+        {/* All checks */}
+        <section className="island col-span-full p-6 flex flex-col gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-[15px] font-bold">All checks</h2>
+            <div role="group" aria-label="Filter checks" className="flex flex-wrap gap-1.5">
+              {categoriesPresent.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setFilter(c.id)}
+                  aria-pressed={filter === c.id}
+                  className={`h-8 px-3 rounded-full text-[13px] font-medium border transition-colors ${
+                    filter === c.id ? 'bg-ink text-white border-ink' : 'bg-island text-ink-2 border-line-strong hover:bg-inset'
+                  }`}
+                >
+                  {c.label}
+                  {c.id === 'all' && ` ${validations.length}`}
+                </button>
+              ))}
+            </div>
+          </div>
+          <ul className="flex flex-col divide-y divide-line">
+            {visible.map((item) => {
+              const s = STATUS_STYLE[item.status];
+              return (
+                <li key={item.id} className="flex flex-wrap items-start gap-3.5 py-3.5">
+                  <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${s.bg} ${s.fg}`}>
+                    <s.Icon className="w-3.5 h-3.5" strokeWidth={3} />
+                  </span>
+                  <div className="flex-[1_1_300px] min-w-0 flex flex-col gap-0.5">
+                    <span className="font-semibold">{item.title}</span>
+                    <span className="text-[13px] text-muted leading-relaxed">{item.description}</span>
+                    {item.recommendation && <span className="text-[13px] text-accent-ink">Fix: {item.recommendation}</span>}
+                  </div>
+                  <span className="text-xs text-muted px-2.5 py-1 rounded-full border border-line-strong capitalize">{item.category}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
       </div>
     </div>
   );
